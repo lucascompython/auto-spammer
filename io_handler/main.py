@@ -23,11 +23,9 @@ def toggle_autoclicker(interval: float, toggle: bool) -> None:
         sleep(float(interval))
 
 
-proc: multiprocessing.Process | None = None
-
-
-def start_autoclicker(interval: float, toggle: bool) -> None:
-    global proc
+def start_autoclicker(
+    interval: float, toggle: bool, proc: multiprocessing.Process | None
+) -> None:
     if proc is None:
         proc = multiprocessing.Process(
             target=toggle_autoclicker, args=(interval, toggle)
@@ -52,8 +50,9 @@ def main() -> None:
         key, interval = args.autoclicker
         interval = float(interval)
         toggle = False
+        proc = None
 
-        keyboard.add_hotkey(key, start_autoclicker, args=(interval, toggle))
+        keyboard.add_hotkey(key, start_autoclicker, args=(interval, toggle, proc))
 
     keyboard.wait()
 
