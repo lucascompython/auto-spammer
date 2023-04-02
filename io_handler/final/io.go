@@ -75,9 +75,15 @@ func startHook(bindJson string) {
 	//"F8": "o caralho que ta foda"
 	//}
 	//}`
+	fmt.Println(bindJson)
 	var binds KeyBinds
 
-	json.Unmarshal([]byte(bindJson), &binds)
+	err := json.Unmarshal([]byte(bindJson), &binds)
+	if err != nil {
+		fmt.Println("ERROR: ", err)
+		return
+	}
+
 	fmt.Println(binds)
 	when := 0
 

@@ -74,9 +74,8 @@ typedef struct { void *data; GoInt len; GoInt cap; } GoSlice;
 extern "C" {
 #endif
 
-extern void startHook();
+extern void startHook(GoString bindJson);
 extern void endHook();
-extern void hello();
 
 #ifdef __cplusplus
 }
