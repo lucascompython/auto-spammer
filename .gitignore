@@ -27,3 +27,5 @@ dist-ssr
 build
 *.pyc
 *.c
+*.h
+*.a
