@@ -2,6 +2,7 @@
 package main
 
 import (
+	"C"
 	"encoding/json"
 	"fmt"
 	"runtime"
@@ -12,7 +13,6 @@ import (
 	"github.com/go-vgo/robotgo"
 	hook "github.com/robotn/gohook"
 )
-import "C"
 
 var FKeysLinux = map[uint16]string{
 	65470: "F1",
@@ -52,7 +52,6 @@ var quitAutoClicker = make(chan bool)
 
 func autoclicker(delay uint16) {
 	for {
-		fmt.Println("newClicker")
 		select {
 		case <-quitAutoClicker:
 			return
@@ -66,16 +65,6 @@ func autoclicker(delay uint16) {
 //export startHook
 func startHook(bindJson string) {
 
-	fmt.Println("START")
-
-	//bindJson := `{
-	//"binds": {
-	//"F6": "ola",
-	//"F7": "autoclicker:100",
-	//"F8": "o caralho que ta foda"
-	//}
-	//}`
-	fmt.Println(bindJson)
 	var binds KeyBinds
 
 	err := json.Unmarshal([]byte(bindJson), &binds)
@@ -130,13 +119,11 @@ func startHook(bindJson string) {
 	})
 
 	s := hook.Start()
-	//defer hook.End()
 	<-hook.Process(s)
 }
 
 //export endHook
 func endHook() {
-	fmt.Println("END")
 	hook.End()
 }
 
