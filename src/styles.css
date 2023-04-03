@@ -86,7 +86,12 @@ button {
 
 #greet-input {
   margin-right: 5px;
+  
 }
+select{
+  font-size: medium;
+}
+
 
 @media (prefers-color-scheme: dark) {
   :root {

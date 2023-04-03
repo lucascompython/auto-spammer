@@ -1,7 +1,8 @@
-.logo.vite:hover {
-  filter: drop-shadow(0 0 2em #747bff);
+.logo.github:hover {
+    filter: drop-shadow(0 0 2em #36373f);
 }
-
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafb);
+@media (prefers-color-scheme: dark) {
+    .logo.github:hover {
+        filter: drop-shadow(0 0 2em #ffff);
+    }
 }
