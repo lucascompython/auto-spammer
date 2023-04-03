@@ -28,7 +28,8 @@
         "icons/icon.ico"
       ],
       "identifier": "com.auto.spammer",
-      "targets": "all"
+      "targets": "all",
+      "externalBin": []
     },
     "security": {
       "csp": null
