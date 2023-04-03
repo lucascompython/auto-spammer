@@ -29,7 +29,7 @@
       ],
       "identifier": "com.auto.spammer",
       "targets": "all",
-      "externalBin": []
+      "resources": []
     },
     "security": {
       "csp": null
