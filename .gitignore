@@ -29,3 +29,5 @@ build
 *.c
 *.h
 *.a
+*.dll
+*.so
