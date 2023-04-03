@@ -41,7 +41,6 @@ def build_go(target: str, upx: bool, dev: bool):
         print("Compressing with UPX...")
         subprocess.run(["upx", "--ultra-brute", f"libio.{'a' if target == 'linux' else 'dll'}" ], cwd="io_handler")
         print(f"Done compressing! Took {perf_counter() - start:.2f}s")
-    #TODO inotifywait
 
 
 
