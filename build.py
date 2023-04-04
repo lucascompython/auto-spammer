@@ -1,8 +1,10 @@
 import argparse
 import json
+import shutil
 import subprocess
 import sys
 from time import perf_counter
+import os 
 
 OS = sys.platform
 
@@ -28,7 +30,8 @@ def parse_cli() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def build_go(target: str, upx: bool, dev: bool):
+def build_go(target: str, upx: bool):
+    io_handler_path = os.path.join("src-tauri", "src", "io_handler")
     print(Colors.BLUE + "Building Go code..." + Colors.RESET)
     start = perf_counter()
     cmds = f"go build -v -buildmode=c-shared -o libio.{'a' if target == 'linux' else 'dll'} -ldflags='-w -s' io.go"
@@ -39,18 +42,15 @@ def build_go(target: str, upx: bool, dev: bool):
     elif target == "linux" and OS == "win32": # Cross compiling from windows to linux
         extra_args = "GOOS=linux GOARCH=amd64 "
         cmds = extra_args + cmds
-    subprocess.run(cmds, cwd="io_handler", shell=True)
+    subprocess.run(cmds, cwd=io_handler_path, shell=True)
     print(Colors.GREEN + f"Done Building! Took {Colors.BOLD}{perf_counter() - start:.2f}s{Colors.RESET}" + Colors.RESET)
-    if upx and dev:
-        sys.stderr.write(f"{Colors.RED}ERROR:{Colors.RESET} UPX cannot be used in development mode!\n")
-        sys.exit(1)
     if upx and target == "linux":
         print(f"{Colors.YELLOW}WARNING:{Colors.RESET} UPX cannot be used on .a files!")
         return
     if upx:
         start = perf_counter()
         print(Colors.BLUE + "Compressing library with UPX..." + Colors.RESET)
-        subprocess.run(["upx", "--ultra-brute", f"libio.{'a' if target == 'linux' else 'dll'}" ], cwd="io_handler")
+        subprocess.run(["upx", "--ultra-brute", f"libio.{'a' if target == 'linux' else 'dll'}" ], cwd=io_handler_path)
         print(Colors.GREEN + f"Done compressing! Took {Colors.BOLD}{perf_counter() - start:.2f}s{Colors.RESET}" + Colors.RESET)
 
 
@@ -62,17 +62,18 @@ def tauri_config(target: str):
     external_bin.clear()
     match target:
         case "win32":
-            external_bin.append("../io_handler/libio.dll")
+            external_bin.append("./libio.dll")
         case "linux":
-            external_bin.append("../io_handler/libio.a")
+            external_bin.append("./libio.a")
 
     with open("./src-tauri/tauri.conf.json", "w") as f:
         json.dump(tauri_config, f, indent=4)
     
 def build_tauri(target: str, upx: bool, dev: bool):
     print(Colors.BLUE + "Building Tauri..." + Colors.RESET)
+    shutil.copyfile(f"./src-tauri/src/io_handler/libio.{'a' if target == 'linux' else 'dll'}", f"./src-tauri/libio.{'a' if target == 'linux' else 'dll'}")
     if dev:
-        subprocess.run(["tauri", "build", "--dev"], cwd="src-tauri")
+        subprocess.run(["cargo", "tauri", "dev"])
     else:
         start = perf_counter()
         cargo_target = ""
@@ -89,7 +90,7 @@ def build_tauri(target: str, upx: bool, dev: bool):
             print(Colors.BLUE + "Compressing app with UPX..." + Colors.RESET)
             subprocess.run(["upx", "--ultra-brute", f"auto-spammer{'.exe' if target == 'win32' else ''}" ], cwd=f"src-tauri/target/{cargo_target}/release")
             print(Colors.GREEN + f"Done compressing! Took {perf_counter() - start:.2f}s" + Colors.RESET)
-
+    os.remove(f"./src-tauri/libio.{'a' if target == 'linux' else 'dll'}")
 
 def main():
     args = parse_cli()
@@ -101,7 +102,9 @@ def main():
         sys.stderr.write(f"{Colors.RED}ERROR:{Colors.RESET} You cannot specify both development and release mode!\n")
         sys.exit(1)
 
-    build_go(args.target, args.upx, args.dev)
+    if not args.dev: # Build go code only if we are in release mode because of the cross compiling and UPX. 
+        #The go code is built in dev mode by tauri
+        build_go(args.target, args.upx)
 
     tauri_config(args.target)
 
