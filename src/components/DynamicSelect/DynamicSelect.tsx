@@ -1,19 +1,23 @@
 import { useState, useEffect, useRef } from "react";
-
+import React from "react";
 const DynamicSelect = () => {
     //const [message, setMessage] = useState<{ [id: number]: string }>({});
     const [inputCount, setInputCount] = useState(2);
     //const [anotherOne, setAnotherOne] = useState(false);
     const [inputValues, setInputValues] = useState<string[]>([]);
+    const [selectValues, setSelectValues] = useState<string[]>([]);
     const inputRefs = useRef([]);
-    const selectRefs = useRef();
+    const selectRefs = useRef([]);
 
     useEffect(() => {
         inputRefs.current = inputRefs.current.slice(0, inputCount);
     }, [inputCount]);
 
-    const handleInputChange = (event, index) => {
-        const { value } = event.target;
+    const handleInputChange = (
+        event: React.FormEvent<EventTarget>,
+        index: number
+    ) => {
+        const { value } = event.target as HTMLInputElement;
         setInputValues((prevValues) => {
             const newValues = [...prevValues];
             newValues[index] = value;
@@ -27,14 +31,33 @@ const DynamicSelect = () => {
             setInputValues((prevValues) => prevValues.slice(0, -1));
         }
     };
+
+    const handleSelectChange = (
+        event: React.ChangeEvent<HTMLSelectElement>,
+        index: number
+    ) => {
+        const { value } = event.target;
+        setSelectValues((prevValues) => {
+            const newValues = [...prevValues];
+            newValues[index] = value;
+            return newValues;
+        });
+
+        console.log(index, value);
+    };
+
     const FKeysInput = ({ id }: { id: number }) => {
         //setInputCount(id);
         //setAnotherOne(false);
 
-        console.log(inputCount);
+        //console.log(inputCount);
         return (
             <>
-                <select ref={selectRefs}>
+                <select
+                    ref={(el) => selectRefs}
+                    onChange={(e) => handleSelectChange(e, id)}
+                    value={selectValues[id]}
+                >
                     <option value="F1">F1</option>
                     <option value="F2">F2</option>
                     <option value="F3">F3</option>
@@ -63,7 +86,7 @@ const DynamicSelect = () => {
                     }}
                     placeholder="Enter the message"
                     value={inputValues[id]}
-                    ref={(el) => (inputRefs.current[id] = el)}
+                    ref={(el) => inputRefs}
                     onBlur={(event) => handleInputChange(event, id)}
                 />
                 <br />
@@ -76,7 +99,7 @@ const DynamicSelect = () => {
     //if (message[inputCount] !== "") {
     //setAnotherOne(true);
     //setAnotherOne(false);
-    //}
+    //
     //}, [message, inputCount]);
 
     //const renderedInputs = [];

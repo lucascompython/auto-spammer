@@ -9,17 +9,15 @@ fn main() {
                 "-buildmode=c-shared",
                 "-o",
                 &format!("../../libio.{}", ext),
-                "-ldflags",
-                "-s -w",
                 "io.go",
             ])
             .current_dir("./src/io_handler")
             .status()
             .expect("failed to build io library");
+        println!("cargo:rerun-if-changed=src/io_handler/io.go");
     }
 
     println!("cargo:rustc-link-search=native=./");
     println!("cargo:rustc-link-lib=dylib=io");
-    println!("cargo:rerun-if-changed=src/io_handler/io.go");
     tauri_build::build()
 }
