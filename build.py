@@ -5,6 +5,7 @@ import subprocess
 import sys
 from time import perf_counter
 import os 
+import os.path
 
 OS = sys.platform
 
@@ -71,6 +72,10 @@ def tauri_config(target: str):
     
 def build_tauri(target: str, upx: bool, dev: bool):
     print(Colors.BLUE + "Building Tauri..." + Colors.RESET)
+    for file in os.listdir("./src-tauri"):
+        if file.endswith(".dll") or file.endswith(".a") or file.endswith(".h"):
+            os.remove(os.path.join("./src-tauri", file))
+
     shutil.copyfile(f"./src-tauri/src/io_handler/libio.{'a' if target == 'linux' else 'dll'}", f"./src-tauri/libio.{'a' if target == 'linux' else 'dll'}")
     if dev:
         subprocess.run(["cargo", "tauri", "dev"])

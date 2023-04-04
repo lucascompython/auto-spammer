@@ -1,8 +1,7 @@
-use std::env::consts::OS;
-use std::process::Command;
-
 fn main() {
     if cfg!(debug_assertions) {
+        use std::env::consts::OS;
+        use std::process::Command;
         let ext = if OS == "windows" { "dll" } else { "a" };
         Command::new("go")
             .args(&[
