@@ -31,3 +31,5 @@ build
 *.a
 *.dll
 *.so
+zig-cache
+zig-out
