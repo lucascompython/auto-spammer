@@ -141,7 +141,6 @@ def main():
     
     if args.target == "win32" and OS == "linux" and args.use_nightly:
         sys.stderr.write(f"{Colors.RED}ERROR:{Colors.RESET} You cannot use the nightly std optimization to cross compile from Linux to Windows!\n")
-        sys.exit(1)
 
     is_all = False
     if args.target == "all":
