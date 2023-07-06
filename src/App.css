@@ -1,8 +1,0 @@
-.logo.github:hover {
-    filter: drop-shadow(0 0 2em #36373f);
-}
-@media (prefers-color-scheme: dark) {
-    .logo.github:hover {
-        filter: drop-shadow(0 0 2em #ffff);
-    }
-}
