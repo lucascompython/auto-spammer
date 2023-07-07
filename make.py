@@ -40,7 +40,7 @@ def parse_args() -> argparse.Namespace:
         "-c",
         "--clean",
         action="store_true",
-        help="Clean the build directory, node_modules and dist directory.",
+        help=f"Clean the {Colors.UNDERLINE}build{Colors.END} directory, {Colors.UNDERLINE}node_modules{Colors.END} and {Colors.UNDERLINE}dist{Colors.END} directory.",
     )
     parser.add_argument(
         "-u",
@@ -83,12 +83,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "pnpm",
         nargs="*",
-        help="Run pnpm commands in src-frontend.",
+        help=f"Run {Colors.BOLD}pnpm{Colors.END} commands in {Colors.UNDERLINE}src-frontend{Colors.END}.",
     )
     parser.add_argument(
         "cargo",
         nargs="*",
-        help="Run cargo commands in src-tauri.",
+        help=f"Run {Colors.BOLD}cargo{Colors.END} commands in {Colors.UNDERLINE}src-tauri{Colors.END}.",
     )
 
     return parser.parse_args()
@@ -194,7 +194,9 @@ def config_toml(target: str, mold: bool = False, native: bool = False) -> None:
 
 def main(args: argparse.Namespace):
     if args.pnpm:
-        subprocess.run(["pnpm" + ".cmd" * (OS == "win"), *args.pnpm], cwd="src-frontend")
+        subprocess.run(
+            ["pnpm" + ".cmd" * (OS == "win"), *args.pnpm], cwd="src-frontend"
+        )
         return
     if args.cargo:
         subprocess.run(["cargo", *args.cargo], cwd="src-tauri")
