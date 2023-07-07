@@ -115,7 +115,7 @@ def success_message(message: str) -> None:
 def check_node_modules() -> None:
     if not os.path.isdir("src-frontend/node_modules"):
         info_message("Installing frontend dependencies...")
-        subprocess.run(["pnpm", "install"], cwd="src-frontend")
+        subprocess.run(["pnpm" + ".cmd" * (OS == "win"), "install"], cwd="src-frontend")
 
 
 def build_tauri(target: str, mode: str, nightly: bool) -> None:
@@ -194,7 +194,7 @@ def config_toml(target: str, mold: bool = False, native: bool = False) -> None:
 
 def main(args: argparse.Namespace):
     if args.pnpm:
-        subprocess.run(["pnpm", *args.pnpm], cwd="src-frontend")
+        subprocess.run(["pnpm" + ".cmd" * (OS == "win"), *args.pnpm], cwd="src-frontend")
         return
     if args.cargo:
         subprocess.run(["cargo", *args.cargo], cwd="src-tauri")
