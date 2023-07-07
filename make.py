@@ -46,7 +46,7 @@ def parse_args() -> argparse.Namespace:
         "-u",
         "--upx",
         action="store_true",
-        help=f"Compress the executable with {Colors.UNDERLINE}UPX{Colors.END}.",
+        help=f"{Colors.YELLOW}UNSTABLE:{Colors.END} Compress the executable with {Colors.UNDERLINE}UPX{Colors.END}. Might flag the app as virus.",
     )
     parser.add_argument(
         "-t",
@@ -72,7 +72,7 @@ def parse_args() -> argparse.Namespace:
         "-m",
         "--mold",
         action="store_true",
-        help=f"Use {Colors.BOLD}MOLD{Colors.END} linker only for {Colors.BOLD}Linux{Colors.END}.",
+        help=f"Use {Colors.BOLD}MOLD{Colors.END} linker only for {Colors.UNDERLINE}Linux{Colors.END}.",
     )
     parser.add_argument(
         "-na",
