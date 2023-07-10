@@ -81,12 +81,12 @@ def parse_args() -> argparse.Namespace:
         help=f"Use the {Colors.ITALIC}'target-cpu=native'{Colors.END} RUSTFLAG.",
     )
     parser.add_argument(
-        "pnpm",
+        "-pnpm",
         nargs="*",
         help=f"Run {Colors.BOLD}pnpm{Colors.END} commands in {Colors.UNDERLINE}src-frontend{Colors.END}.",
     )
     parser.add_argument(
-        "cargo",
+        "-cargo",
         nargs="*",
         help=f"Run {Colors.BOLD}cargo{Colors.END} commands in {Colors.UNDERLINE}src-tauri{Colors.END}.",
     )
@@ -137,7 +137,9 @@ def build_tauri(target: str, mode: str, nightly: bool) -> None:
                 ]
             )
         subprocess.run(args, cwd="src-tauri")
-        success_message(f"Built in {perf_counter() - start:.2f} seconds.")
+        success_message(
+            f"Built in {Colors.BOLD}{perf_counter() - start:.2f}{Colors.END} seconds!"
+        )
     else:
         error_message("Invalid build mode.", True)
 
@@ -164,6 +166,7 @@ def clean() -> None:
 def upx(target: str) -> None:
     warning_message("Using UPX may flag your executable as a virus.")
     info_message("Compressing executable with UPX...")
+    start = perf_counter()
     subprocess.run(
         [
             "upx",
@@ -172,7 +175,9 @@ def upx(target: str) -> None:
             + ".exe" * ("windows" in target),
         ]
     )
-    info_message("Compression complete.")
+    success_message(
+        f"Compression complete in {Colors.BOLD}{perf_counter() - start:.2f}{Colors.END} seconds!"
+    )
 
 
 def config_toml(target: str, mold: bool = False, native: bool = False) -> None:
@@ -190,6 +195,16 @@ def config_toml(target: str, mold: bool = False, native: bool = False) -> None:
             )
         if native and not mold:
             f.write("rustflags = ['-C', 'target-cpu=native']")
+
+
+def convert_bytes(num: int | float) -> str:
+    """
+    this function will convert bytes to MB.... GB... etc
+    """
+    for x in ["bytes", "KB", "MB", "GB", "TB"]:
+        if num < 1024.0:
+            return "%3.1f %s" % (num, x)
+        num /= 1024.0
 
 
 def main(args: argparse.Namespace):
@@ -281,6 +296,14 @@ def main(args: argparse.Namespace):
             )
         else:
             upx(target)
+
+    size = os.path.getsize(
+        f"src-tauri/target/{target + '/release' if mode == 'release' else 'debug'}/autospammer"
+        + (".exe" if OS == "win" else "")
+    )
+    print(
+        f"\n{Colors.BOLD}Executable size:{Colors.END} {Colors.CYAN + convert_bytes(size) + Colors.END}"
+    )
 
 
 if __name__ == "__main__":

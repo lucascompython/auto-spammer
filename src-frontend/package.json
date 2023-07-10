@@ -5,12 +5,18 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "astro build",
+    "build": "astro check && svelte-check && astro build",
     "preview": "astro preview",
     "astro": "astro"
   },
   "dependencies": {
+    "@astrojs/svelte": "^3.1.0",
+    "@tauri-apps/api": "^1.4.0",
     "astro": "^2.8.0",
-    "astro-compress": "^1.1.49"
+    "astro-compress": "^1.1.49",
+    "svelte": "^4.0.0"
+  },
+  "devDependencies": {
+    "svelte-check": "^3.4.5"
   }
 }
