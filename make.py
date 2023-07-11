@@ -141,9 +141,10 @@ def build_tauri(target: str, mode: str, nightly: bool) -> None:
             error_message(
                 f"Tauri failed to build after {Colors.BOLD}{perf_counter() - start:.2f}{Colors.END} seconds.",
             )
-        success_message(
-            f"Built in {Colors.BOLD}{perf_counter() - start:.2f}{Colors.END} seconds!"
-        )
+        else:
+            success_message(
+                f"Built in {Colors.BOLD}{perf_counter() - start:.2f}{Colors.END} seconds!"
+            )
     else:
         error_message("Invalid build mode.", True)
 
@@ -296,7 +297,7 @@ def main(args: argparse.Namespace):
     try:
         size = os.path.getsize(
             f"src-tauri/target/{target + '/release' if mode == 'release' else 'debug'}/autospammer"
-            + (".exe" if OS == "win" else "")
+            + (".exe" if "win" in target else "")
         )
         print(
             f"\n{Colors.BOLD}Executable size:{Colors.END} {Colors.CYAN + convert_bytes(size) + Colors.END}"
