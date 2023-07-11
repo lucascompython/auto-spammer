@@ -136,7 +136,11 @@ def build_tauri(target: str, mode: str, nightly: bool) -> None:
                     "build-std-features=panic_immediate_abort",
                 ]
             )
-        subprocess.run(args, cwd="src-tauri")
+        tauri = subprocess.run(args, cwd="src-tauri")
+        if tauri.returncode != 0:
+            error_message(
+                f"Tauri failed to build after {Colors.BOLD}{perf_counter() - start:.2f}{Colors.END} seconds.",
+            )
         success_message(
             f"Built in {Colors.BOLD}{perf_counter() - start:.2f}{Colors.END} seconds!"
         )
@@ -160,24 +164,29 @@ def clean() -> None:
             f"{Colors.BOLD}node_modules{Colors.END} directory not found. {Colors.UNDERLINE}Skipping...{Colors.END}"
         )
 
-    info_message("Cleaned.")
+    success_message("Cleaned.")
 
 
 def upx(target: str) -> None:
     warning_message("Using UPX may flag your executable as a virus.")
     info_message("Compressing executable with UPX...")
     start = perf_counter()
-    subprocess.run(
+    u = subprocess.run(
         [
             "upx",
             "--ultra-brute",
             f"src-tauri/target/{target}/release/autospammer"
             + ".exe" * ("windows" in target),
-        ]
+        ],
     )
-    success_message(
-        f"Compression complete in {Colors.BOLD}{perf_counter() - start:.2f}{Colors.END} seconds!"
-    )
+    if u.returncode != 0:
+        error_message(
+            f"Compression failed after {Colors.BOLD}{perf_counter() - start:.2f}{Colors.END} seconds.",
+        )
+    else:
+        success_message(
+            f"Compression complete in {Colors.BOLD}{perf_counter() - start:.2f}{Colors.END} seconds!"
+        )
 
 
 def config_toml(target: str, mold: bool = False, native: bool = False) -> None:
@@ -220,9 +229,22 @@ def main(args: argparse.Namespace):
     if args.clean:
         clean()
 
+    target = args.target
+    if target == "linux":
+        target = "x86_64-unknown-linux-gnu"
+    elif target == "win" and OS == "linux":
+        target = "x86_64-pc-windows-gnu"
+    elif target == "win" and OS == "win":
+        target = "x86_64-pc-windows-msvc"
+
     if not args.dev and not args.release:
         if args.clean:  # if we're cleaning and don't specify a build mode, we're done
             return
+
+        if args.upx:
+            upx(target)
+            return
+
         error_message("You must specify either --dev or --release.", True)
 
     if args.dev and args.release:
@@ -235,14 +257,6 @@ def main(args: argparse.Namespace):
         warning_message(
             "Using the 'target-cpu=native' RUSTFLAG may cause issues on other machines."
         )
-
-    target = args.target
-    if target == "linux":
-        target = "x86_64-unknown-linux-gnu"
-    elif target == "win" and OS == "linux":
-        target = "x86_64-pc-windows-gnu"
-    elif target == "win" and OS == "win":
-        target = "x86_64-pc-windows-msvc"
 
     if args.dev:
         mode = "dev"
@@ -271,6 +285,25 @@ def main(args: argparse.Namespace):
         if args.mold or args.native:
             rmtree("src-tauri/.cargo")
 
+    if args.upx:
+        if args.dev:
+            warning_message(
+                f"Cannot {Colors.UNDERLINE}compress{Colors.END} in development mode."
+            )
+        else:
+            upx(target)
+
+    try:
+        size = os.path.getsize(
+            f"src-tauri/target/{target + '/release' if mode == 'release' else 'debug'}/autospammer"
+            + (".exe" if OS == "win" else "")
+        )
+        print(
+            f"\n{Colors.BOLD}Executable size:{Colors.END} {Colors.CYAN + convert_bytes(size) + Colors.END}"
+        )
+    except FileNotFoundError:
+        warning_message("Cannot get executable size.")
+
     if args.run:
         if args.release:
             info_message("Running...")
@@ -288,22 +321,6 @@ def main(args: argparse.Namespace):
             warning_message(
                 f"Cannot {Colors.UNDERLINE}run{Colors.END} in development mode."
             )
-
-    if args.upx:
-        if args.dev:
-            warning_message(
-                f"Cannot {Colors.UNDERLINE}compress{Colors.END} in development mode."
-            )
-        else:
-            upx(target)
-
-    size = os.path.getsize(
-        f"src-tauri/target/{target + '/release' if mode == 'release' else 'debug'}/autospammer"
-        + (".exe" if OS == "win" else "")
-    )
-    print(
-        f"\n{Colors.BOLD}Executable size:{Colors.END} {Colors.CYAN + convert_bytes(size) + Colors.END}"
-    )
 
 
 if __name__ == "__main__":
