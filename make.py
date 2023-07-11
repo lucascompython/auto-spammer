@@ -66,7 +66,7 @@ def parse_args() -> argparse.Namespace:
         "-ru",
         "--run",
         action="store_true",
-        help="Run the program after building if possible.",
+        help="Run the program. If build can also run after compiling.",
     )
     parser.add_argument(
         "-m",
@@ -90,7 +90,13 @@ def parse_args() -> argparse.Namespace:
         nargs="*",
         help=f"Run {Colors.BOLD}cargo{Colors.END} commands in {Colors.UNDERLINE}src-tauri{Colors.END}.",
     )
-
+    smallest = parser.add_mutually_exclusive_group()
+    smallest.add_argument(
+        "-s",
+        "--smallest",
+        action="store_true",
+        help=f"Build the smallest binary possible. {Colors.UNDERLINE}UPX{Colors.END} and {Colors.UNDERLINE}nightly{Colors.END} are enabled.",
+    )
     return parser.parse_args()
 
 
@@ -237,6 +243,11 @@ def main(args: argparse.Namespace):
     if args.cargo:
         subprocess.run(["cargo", *args.cargo], cwd="src-tauri")
         return
+    
+    if args.smallest:
+        args.release = True
+        args.upx = True
+        args.nightly = True
 
     if args.clean:
         clean()
@@ -262,6 +273,16 @@ def main(args: argparse.Namespace):
         if args.upx:
             upx(target)
             get_size("release", target)
+            return
+        
+        if args.run:
+            ru = subprocess.run(
+                [f"./src-tauri/target/{target}/release/autospammer" + ".exe" * ("win" in target)],  
+                capture_output=True
+            )
+        
+            if ru.returncode != 0:
+                error_message("Failed to run executable.", True)
             return
 
         error_message("You must specify either --dev or --release.", True)
