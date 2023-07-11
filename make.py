@@ -95,21 +95,21 @@ def parse_args() -> argparse.Namespace:
 
 
 def error_message(message: str, exit: bool = False) -> None:
-    sys.stderr.write(f"{Colors.RED}Error:{Colors.END} {message}\n")
+    sys.stderr.write(f"{Colors.RED}ERROR:{Colors.END} {message}\n")
     if exit:
         sys.exit(1)
 
 
 def warning_message(message: str) -> None:
-    print(f"{Colors.YELLOW}Warning:{Colors.END} {message}")
+    print(f"{Colors.YELLOW}WARNING:{Colors.END} {message}")
 
 
 def info_message(message: str) -> None:
-    print(f"{Colors.BLUE}Info:{Colors.END} {message}")
+    print(f"{Colors.BLUE}INFO:{Colors.END} {message}")
 
 
 def success_message(message: str) -> None:
-    print(f"{Colors.GREEN}Success:{Colors.END} {message}")
+    print(f"{Colors.GREEN}SUCCESS:{Colors.END} {message}")
 
 
 def check_node_modules() -> None:
