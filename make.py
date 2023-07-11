@@ -216,6 +216,17 @@ def convert_bytes(num: int | float) -> str:
             return "%3.1f %s" % (num, x)
         num /= 1024.0
 
+def get_size(mode: str, target: str):
+    try:
+        size = os.path.getsize(
+            f"src-tauri/target/{target + '/release' if mode == 'release' else 'debug'}/autospammer"
+            + (".exe" if "win" in target else "")
+        )
+        print(
+            f"\n{Colors.BOLD}Executable size:{Colors.END} {Colors.CYAN + convert_bytes(size) + Colors.END}"
+        )
+    except FileNotFoundError:
+        warning_message("Cannot get executable size.")
 
 def main(args: argparse.Namespace):
     if args.pnpm:
@@ -238,12 +249,19 @@ def main(args: argparse.Namespace):
     elif target == "win" and OS == "win":
         target = "x86_64-pc-windows-msvc"
 
+    if args.dev:
+        mode = "dev"
+    elif args.release:
+        mode = "release"
+
+
     if not args.dev and not args.release:
         if args.clean:  # if we're cleaning and don't specify a build mode, we're done
             return
 
         if args.upx:
             upx(target)
+            get_size("release", target)
             return
 
         error_message("You must specify either --dev or --release.", True)
@@ -258,11 +276,6 @@ def main(args: argparse.Namespace):
         warning_message(
             "Using the 'target-cpu=native' RUSTFLAG may cause issues on other machines."
         )
-
-    if args.dev:
-        mode = "dev"
-    elif args.release:
-        mode = "release"
 
     check_node_modules()
     try:
@@ -294,16 +307,7 @@ def main(args: argparse.Namespace):
         else:
             upx(target)
 
-    try:
-        size = os.path.getsize(
-            f"src-tauri/target/{target + '/release' if mode == 'release' else 'debug'}/autospammer"
-            + (".exe" if "win" in target else "")
-        )
-        print(
-            f"\n{Colors.BOLD}Executable size:{Colors.END} {Colors.CYAN + convert_bytes(size) + Colors.END}"
-        )
-    except FileNotFoundError:
-        warning_message("Cannot get executable size.")
+    get_size(mode, target)
 
     if args.run:
         if args.release:
