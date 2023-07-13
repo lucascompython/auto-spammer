@@ -222,6 +222,7 @@ def convert_bytes(num: int | float) -> str:
             return "%3.1f %s" % (num, x)
         num /= 1024.0
 
+
 def get_size(mode: str, target: str):
     try:
         size = os.path.getsize(
@@ -234,6 +235,7 @@ def get_size(mode: str, target: str):
     except FileNotFoundError:
         warning_message("Cannot get executable size.")
 
+
 def main(args: argparse.Namespace):
     if args.pnpm:
         subprocess.run(
@@ -243,7 +245,7 @@ def main(args: argparse.Namespace):
     if args.cargo:
         subprocess.run(["cargo", *args.cargo], cwd="src-tauri")
         return
-    
+
     if args.smallest:
         args.release = True
         args.upx = True
@@ -265,7 +267,6 @@ def main(args: argparse.Namespace):
     elif args.release:
         mode = "release"
 
-
     if not args.dev and not args.release:
         if args.clean:  # if we're cleaning and don't specify a build mode, we're done
             return
@@ -274,13 +275,15 @@ def main(args: argparse.Namespace):
             upx(target)
             get_size("release", target)
             return
-        
+
         if args.run:
             ru = subprocess.run(
-                [f"./src-tauri/target/{target}/release/autospammer" + ".exe" * ("win" in target)],  
-                capture_output=True
+                [
+                    f"./src-tauri/target/{target}/release/autospammer"
+                    + ".exe" * ("win" in target)
+                ],
             )
-        
+
             if ru.returncode != 0:
                 error_message("Failed to run executable.", True)
             return
