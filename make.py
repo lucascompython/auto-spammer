@@ -221,6 +221,7 @@ def convert_bytes(num: int | float) -> str:
         if num < 1024.0:
             return "%3.1f %s" % (num, x)
         num /= 1024.0
+    return f"{num:.1f} PB"
 
 
 def get_size(mode: str, target: str):
