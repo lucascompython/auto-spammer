@@ -213,7 +213,9 @@ def config_toml(target: str, mold: bool = False, native: bool = False) -> None:
             f.write("rustflags = ['-C', 'target-cpu=native']")
 
 
-def convert_bytes(num: int | float) -> str:
+def convert_bytes(num: int | float | str) -> str:
+    if isinstance(num, str):
+        num = int(num)
     """
     this function will convert bytes to MB.... GB... etc
     """
@@ -235,6 +237,32 @@ def get_size(mode: str, target: str):
         )
     except FileNotFoundError:
         warning_message("Cannot get executable size.")
+
+
+def run(target: str) -> None:
+    args = [
+        f"./src-tauri/target/{target}/release/autospammer" + ".exe" * ("win" in target)
+    ]
+    if OS == "linux":
+        args = [
+            "/usr/bin/time",
+            "-f",
+            '"%M"',
+            *args,
+        ]  # uses the GNU time command to get memory usage
+
+    p = subprocess.run(args, capture_output=OS == "linux")
+    if p.returncode != 0:
+        error_message("Failed to run executable.", True)
+
+    if OS == "linux":
+        mem = (
+            p.stderr.decode().strip().replace('"', "")
+        )  # returns the memory usage in KB
+        mem = convert_bytes(mem + "000")
+        print(
+            f"{Colors.BOLD}Peak memory usage:{Colors.END} {Colors.CYAN}{mem}{Colors.END}"
+        )
 
 
 def main(args: argparse.Namespace):
@@ -278,17 +306,9 @@ def main(args: argparse.Namespace):
             return
 
         if args.run:
-            ru = subprocess.run(
-                [
-                    f"./src-tauri/target/{target}/release/autospammer"
-                    + ".exe" * ("win" in target)
-                ],
-            )
-
-            if ru.returncode != 0:
-                error_message("Failed to run executable.", True)
+            get_size("release", target)
+            run(target)
             return
-
         error_message("You must specify either --dev or --release.", True)
 
     if args.dev and args.release:
@@ -338,12 +358,7 @@ def main(args: argparse.Namespace):
         if args.release:
             info_message("Running...")
             try:
-                subprocess.run(
-                    [
-                        f"./src-tauri/target/{target}/release/autospammer"
-                        + (".exe" if OS == "win" else "")
-                    ]
-                )
+                run(target)
             except FileNotFoundError:
                 error_message("Executable not found.", True)
             info_message("Exiting...")
