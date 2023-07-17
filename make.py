@@ -53,7 +53,7 @@ def parse_args() -> argparse.Namespace:
         "--target",
         type=str,
         help="The target platform to build for.",
-        choices=("win", "linux", "all"),
+        choices=("win", "linux"),
         default=OS,
     )
     parser.add_argument(
