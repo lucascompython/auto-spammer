@@ -243,19 +243,25 @@ def run(target: str) -> None:
     args = [
         f"./src-tauri/target/{target}/release/autospammer" + ".exe" * ("win" in target)
     ]
+    fail = False
     if OS == "linux":
-        args = [
-            "/usr/bin/time",
-            "-f",
-            '"%M"',
-            *args,
-        ]  # uses the GNU time command to get memory usage
+        # check if /usr/bin/time exists
+        if not os.path.isfile("/usr/bin/time"):
+            fail = True
+            warning_message("GNU time command not found. Cannot get memory usage.")
+        else:
+            args = [
+                "/usr/bin/time",
+                "-f",
+                '"%M"',
+                *args,
+            ]  # uses the GNU time command to get memory usage
 
     p = subprocess.run(args, capture_output=OS == "linux")
     if p.returncode != 0:
         error_message("Failed to run executable.", True)
 
-    if OS == "linux":
+    if OS == "linux" and not fail:
         mem = (
             p.stderr.decode().strip().replace('"', "")
         )  # returns the memory usage in KB
