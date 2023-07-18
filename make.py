@@ -215,7 +215,7 @@ def config_toml(target: str, mold: bool = False, native: bool = False) -> None:
 
 def convert_bytes(num: int | float | str) -> str:
     if isinstance(num, str):
-        num = int(num)
+        num = float(num)
     """
     this function will convert bytes to MB.... GB... etc
     """
@@ -256,8 +256,10 @@ def run(target: str) -> None:
                 '"%M"',
                 *args,
             ]  # uses the GNU time command to get memory usage
+    elif OS == "win": # Windows sucks, and I hope it dies.
+        args = ["powershell", "-ExecutionPolicy", "Bypass", "-File", "./get_peak_mem.ps1", *args]
 
-    p = subprocess.run(args, capture_output=OS == "linux")
+    p = subprocess.run(args, capture_output=True)
     if p.returncode != 0:
         error_message("Failed to run executable.", True)
 
@@ -268,6 +270,12 @@ def run(target: str) -> None:
         mem = convert_bytes(mem + "000")
         print(
             f"{Colors.BOLD}Peak memory usage:{Colors.END} {Colors.CYAN}{mem}{Colors.END}"
+        )
+    elif OS == "win" and not fail:
+        mem = p.stdout.decode().strip().replace('"', "")
+        mem = convert_bytes(mem)
+        print(
+            f"{Colors.BOLD}Peak memory usage:{Colors.END} {Colors.CYAN}~{mem}{Colors.END}"
         )
 
 
