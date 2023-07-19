@@ -256,8 +256,15 @@ def run(target: str) -> None:
                 '"%M"',
                 *args,
             ]  # uses the GNU time command to get memory usage
-    elif OS == "win": # Windows sucks, and I hope it dies.
-        args = ["powershell", "-ExecutionPolicy", "Bypass", "-File", "./get_peak_mem.ps1", *args]
+    elif OS == "win":  # Windows sucks, and I hope it dies.
+        args = [
+            "powershell",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-File",
+            "./get_peak_mem.ps1",
+            *args,
+        ]
 
     p = subprocess.run(args, capture_output=True)
     if p.returncode != 0:

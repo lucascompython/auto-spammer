@@ -13,4 +13,4 @@ do {
     }
 } while (!$proc.WaitForExit(10))
 
-Write-Output "$($mem)" # Why divide by 100? I don't know
+Write-Output "$($mem)" 
