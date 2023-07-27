@@ -11,9 +11,10 @@ fn type_string(string: String) {
 }
 
 #[no_mangle]
-pub extern "C" fn main() {
+pub extern "C" fn main() -> usize {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![type_string])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+    0
 }

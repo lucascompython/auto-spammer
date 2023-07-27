@@ -283,7 +283,7 @@ def run(target: str) -> None:
         mem = convert_bytes(mem)
         print(
             f"{Colors.BOLD}Peak memory usage:{Colors.END} {Colors.CYAN}~{mem}{Colors.END}"
-        )
+        )  # Most of the times no accurate at all.
 
 
 def main(args: argparse.Namespace):

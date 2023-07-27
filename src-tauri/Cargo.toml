@@ -15,9 +15,14 @@ rust-version = "1.60"
 tauri-build = { version = "1.4.0", features = [] }
 
 [dependencies]
-serde_json = "1.0"
-serde = { version = "1.0", features = ["derive"] }
-tauri = { version = "1.4.1", features = ["global-shortcut-all", "objc-exception", "shell-open", "wry"], default-features = false }
+serde_json = "1.0.104"
+serde = { version = "1.0.176", features = ["derive"] }
+tauri = { version = "1.4.1", features = [
+    "global-shortcut-all",
+    "objc-exception",
+    "shell-open",
+    "wry",
+], default-features = false }
 enigo = "0.1.2"
 
 [features]
@@ -27,8 +32,8 @@ enigo = "0.1.2"
 custom-protocol = ["tauri/custom-protocol"]
 
 [profile.release]
-panic = "abort" # Strip expensive panic clean-up logic
+panic = "abort"   # Strip expensive panic clean-up logic
 codegen-units = 1 # Compile crates one after another so the compiler can optimize better
-lto = true # Enables link to optimizations
-opt-level = "z" # Optimize for binary size
-strip = true # Remove debug symbols
+lto = true        # Enables link to optimizations
+opt-level = "z"   # Optimize for binary size
+strip = true      # Remove debug symbols

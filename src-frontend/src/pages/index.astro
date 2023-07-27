@@ -4,87 +4,89 @@ import Teste from "../components/teste.svelte";
 ---
 
 <Layout title="Auto-Spammer.">
-	<main>
-		<div class="row">
-			<a
-				href="https://github.com/lucascompython/auto-spammer"
-				target="_blank"
-			>
-				<img
-					src="/icon.png"
-					class="logo auto-spammer dark-mode-only"
-					alt="Auto Spammer logo"
-				/>
-			</a>
-		</div>
-		<h2><strong>Auto-Spammer, a Macro Utility</strong></h2>
-		<Teste client:only />
-		<div class="row">
-			<form>
-				<input id="input1" type="text" placeholder="K" />
-				<input id="input2" type="text" placeholder="type:Hello World" />
-				<br />
-				<button type="submit">Apply</button>
-			</form>
-		</div>
-	</main>
+  <main>
+    <div class="row">
+      <a href="https://github.com/lucascompython/auto-spammer" target="_blank">
+        <img
+          src="/icon.png"
+          class="logo auto-spammer dark-mode-only"
+          alt="Auto Spammer logo"
+        />
+      </a>
+    </div>
+    <h2><strong>Auto-Spammer, a Macro Utility</strong></h2>
+    <Teste client:only />
+    <div class="row">
+      <form>
+        <input id="input1" type="text" placeholder="K" />
+        <input id="input2" type="text" placeholder="type:Hello World" />
+        <br />
+        <button type="submit">Apply</button>
+      </form>
+    </div>
+  </main>
 </Layout>
 <footer>
-	<div class="socials">
-		<a href="https://github.com/lucascompython/" target="_blank">
-			<img src="/github.svg" alt="github" class="social" />
-		</a>
-		<a
-			href="https://discordapp.com/users/325986670824652800"
-			target="_blank"
-		>
-			<img src="/discord.svg" alt="discord" class="social" />
-		</a>
-	</div>
-	<div class="row">
-		<p>
-			<a
-				target="_blank"
-				href="https://github.com/lucascompython/auto-spammer/wiki"
-				class="help"
-			>
-				Need Help?
-			</a>
-		</p>
-	</div>
+  <div class="socials">
+    <a href="https://github.com/lucascompython/" target="_blank">
+      <img src="/github.svg" alt="github" class="social" />
+    </a>
+    <a href="https://discordapp.com/users/325986670824652800" target="_blank">
+      <img src="/discord.svg" alt="discord" class="social" />
+    </a>
+  </div>
+  <div class="row">
+    <p>
+      <a
+        target="_blank"
+        href="https://github.com/lucascompython/auto-spammer/wiki"
+        class="help"
+      >
+        Need Help?
+      </a>
+    </p>
+  </div>
 </footer>
 
 <style>
-	main {
-		margin: 0;
-		padding-top: 10vh;
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		text-align: center;
-	}
+  main {
+    margin: 0;
+    padding-top: 10vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+  }
 
-	.logo.auto-spammer:hover {
-		filter: drop-shadow(0 0 2em gray);
-	}
+  .logo.auto-spammer:hover {
+    filter: drop-shadow(0 0 2em gray);
+  }
 
-	#greet-input {
-		margin-right: 5px;
-	}
-	.help {
-	}
-	footer {
-		position: absolute;
-		width: 100%;
-		bottom: 0;
-		left: 0;
-		right: 0;
-		margin: 0 auto;
-		text-align: center;
-	}
-	.social {
-		width: 48px;
-		height: 48px;
-		margin: 0 5px;
-	}
+  #greet-input {
+    margin-right: 5px;
+  }
+  .help {
+  }
+  footer {
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    text-align: center;
+  }
+  .social {
+    width: 48px;
+    height: 48px;
+    margin: 0 5px;
+  }
 </style>
+<script>
+  import { register } from "@tauri-apps/api/globalShortcut";
+  import { invoke } from "@tauri-apps/api/tauri";
+
+  await register("F6", async () => {
+    await invoke("type_string", { string: "Hello World!" });
+  });
+</script>
