@@ -15,15 +15,15 @@ rust-version = "1.60"
 tauri-build = { version = "1.4.0", features = [] }
 
 [dependencies]
-serde_json = "1.0.104"
-serde = { version = "1.0.183", features = ["derive"] }
+serde_json = "1.0.105"
+serde = { version = "1.0.188", features = ["derive"] }
 tauri = { version = "1.4.1", features = [
     "global-shortcut-all",
     "objc-exception",
     "shell-open",
     "wry",
 ], default-features = false }
-enigo = "0.1.2"
+enigo = "0.1.3"
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem and the built-in dev server is disabled.
