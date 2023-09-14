@@ -88,6 +88,10 @@ import Teste from "../components/teste.svelte";
     await invoke("type_string", { string: "Hello World!" });
   });
 
+  await register("F7", async () => {
+    await invoke("type_string", { string: "morre longe seu fdp!" });
+  });
+
   await register("F5", async () => {
     await invoke("autoclicker", { speed: 100 });
   });

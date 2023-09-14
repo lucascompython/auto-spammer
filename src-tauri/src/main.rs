@@ -2,6 +2,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 #![no_main]
 use enigo::{KeyboardControllable, MouseControllable};
+use tauri::Manager;
 
 static mut CLICKER: bool = false;
 
@@ -12,15 +13,15 @@ fn type_string(string: String) {
 }
 
 #[tauri::command]
-fn autoclicker(speed: usize) {
+fn autoclicker(speed: u64) {
     unsafe {
         CLICKER = !CLICKER;
         if CLICKER {
             std::thread::spawn(move || {
                 let mut enigo = enigo::Enigo::new();
-                loop {
+                while CLICKER {
                     enigo.mouse_click(enigo::MouseButton::Left);
-                    std::thread::sleep(std::time::Duration::from_millis(speed as u64));
+                    std::thread::sleep(std::time::Duration::from_millis(speed));
                 }
             });
         }
