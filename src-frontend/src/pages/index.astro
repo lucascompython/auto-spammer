@@ -87,4 +87,8 @@ import Teste from "../components/teste.svelte";
   await register("F6", async () => {
     await invoke("type_string", { string: "Hello World!" });
   });
+
+  await register("F5", async () => {
+    await invoke("autoclicker", { speed: 100 });
+  });
 </script>
