@@ -24,6 +24,18 @@ class Colors:
     ITALIC: str = "\033[3m"
     END: str = "\033[0m"
 
+    @classmethod
+    def warning_message(cls, message: str) -> None:
+        print(f"{cls.YELLOW}WARNING:{cls.END} {message}")
+
+    @classmethod
+    def info_message(cls, message: str) -> None:
+        print(f"{cls.BLUE}INFO:{cls.END} {message}")
+
+    @classmethod
+    def success_message(cls, message: str) -> None:
+        print(f"{cls.GREEN}SUCCESS:{cls.END} {message}")
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
@@ -106,31 +118,19 @@ def error_message(message: str, exit: bool = False) -> None:
         sys.exit(1)
 
 
-def warning_message(message: str) -> None:
-    print(f"{Colors.YELLOW}WARNING:{Colors.END} {message}")
-
-
-def info_message(message: str) -> None:
-    print(f"{Colors.BLUE}INFO:{Colors.END} {message}")
-
-
-def success_message(message: str) -> None:
-    print(f"{Colors.GREEN}SUCCESS:{Colors.END} {message}")
-
-
 def check_node_modules() -> None:
     if not os.path.isdir("src-frontend/node_modules"):
-        info_message("Installing frontend dependencies...")
+        Colors.info_message("Installing frontend dependencies...")
         subprocess.run(["pnpm" + ".cmd" * (OS == "win"), "install"], cwd="src-frontend")
 
 
 def build_tauri(target: str, mode: str, nightly: bool) -> None:
     if mode == "dev":
-        info_message("Building in development mode...")
+        Colors.info_message("Building in development mode...")
         subprocess.run(["cargo", "tauri", "dev"], cwd="src-tauri")
     elif mode == "release":
         start = perf_counter()
-        info_message("Building in release mode...")
+        Colors.info_message("Building in release mode...")
         args = ["cargo", "tauri", "build", "--target", target]
         if nightly:
             args.extend(
@@ -148,7 +148,7 @@ def build_tauri(target: str, mode: str, nightly: bool) -> None:
                 f"Tauri failed to build after {Colors.BOLD}{perf_counter() - start:.2f}{Colors.END} seconds.",
             )
         else:
-            success_message(
+            Colors.success_message(
                 f"Built in {Colors.BOLD}{perf_counter() - start:.2f}{Colors.END} seconds!"
             )
     else:
@@ -156,27 +156,30 @@ def build_tauri(target: str, mode: str, nightly: bool) -> None:
 
 
 def clean() -> None:
-    info_message("Cleaning...")
+    Colors.info_message("Cleaning...")
+    start = perf_counter()
     subprocess.run(["cargo", "clean"], cwd="src-tauri")
     try:
         rmtree("src-frontend/dist")
     except FileNotFoundError:
-        info_message(
+        Colors.info_message(
             f"{Colors.BOLD}dist{Colors.END} directory not found. {Colors.UNDERLINE}Skipping...{Colors.END}"
         )
     try:
         rmtree("src-frontend/node_modules")
     except FileNotFoundError:
-        info_message(
+        Colors.info_message(
             f"{Colors.BOLD}node_modules{Colors.END} directory not found. {Colors.UNDERLINE}Skipping...{Colors.END}"
         )
 
-    success_message("Cleaned.")
+    Colors.success_message(
+        f"Cleaned in {Colors.BOLD}{perf_counter() - start:.2f}{Colors.END} seconds!"
+    )
 
 
 def upx(target: str) -> None:
-    warning_message("Using UPX may flag your executable as a virus.")
-    info_message("Compressing executable with UPX...")
+    Colors.warning_message("Using UPX may flag your executable as a virus.")
+    Colors.info_message("Compressing executable with UPX...")
     start = perf_counter()
     u = subprocess.run(
         [
@@ -191,7 +194,7 @@ def upx(target: str) -> None:
             f"Compression failed after {Colors.BOLD}{perf_counter() - start:.2f}{Colors.END} seconds.",
         )
     else:
-        success_message(
+        Colors.success_message(
             f"Compression complete in {Colors.BOLD}{perf_counter() - start:.2f}{Colors.END} seconds!"
         )
 
@@ -203,11 +206,11 @@ def config_toml(target: str, mold: bool = False, native: bool = False) -> None:
 
         if mold and native:
             f.write(
-                "linker = 'clang'\nrustflags = ['-C', 'target-cpu=native', '-C', 'link-arg=-fuse-ld=/usr/bin/mold' ]"
+                "linker = 'clang'\nrustflags = ['-C', 'target-cpu=native', '-C', 'link-arg=-fuse-ld=/usr/bin/mold']"
             )
         if mold and not native:
             f.write(
-                "linker = 'clang'\nrustflags = ['-C', 'link-arg=-fuse-ld=/usr/bin/mold' ]"
+                "linker = 'clang'\nrustflags = ['-C', 'link-arg=-fuse-ld=/usr/bin/mold']"
             )
         if native and not mold:
             f.write("rustflags = ['-C', 'target-cpu=native']")
@@ -236,7 +239,7 @@ def get_size(mode: str, target: str):
             f"\n{Colors.BOLD}Executable size:{Colors.END} {Colors.CYAN + convert_bytes(size) + Colors.END}"
         )
     except FileNotFoundError:
-        warning_message("Cannot get executable size.")
+        Colors.warning_message("Cannot get executable size.")
 
 
 def run(target: str) -> None:
@@ -248,7 +251,9 @@ def run(target: str) -> None:
         # check if /usr/bin/time exists
         if not os.path.isfile("/usr/bin/time"):
             fail = True
-            warning_message("GNU time command not found. Cannot get memory usage.")
+            Colors.warning_message(
+                "GNU time command not found. Cannot get memory usage."
+            )
         else:
             args = [
                 "/usr/bin/time",
@@ -336,10 +341,12 @@ def main(args: argparse.Namespace):
         error_message("You cannot specify both --dev and --release.", True)
 
     if args.nightly:
-        warning_message("Using the nightly toolchain is unstable and may cause issues.")
+        Colors.warning_message(
+            "Using the nightly toolchain is unstable and may cause issues."
+        )
 
     if args.native:
-        warning_message(
+        Colors.warning_message(
             "Using the 'target-cpu=native' RUSTFLAG may cause issues on other machines."
         )
 
@@ -350,7 +357,7 @@ def main(args: argparse.Namespace):
 
         if args.mold or args.native:
             if args.mold and target != "x86_64-unknown-linux-gnu":
-                warning_message(
+                Colors.warning_message(
                     f"{Colors.BOLD}Mold{Colors.END} is only available on Linux. {Colors.UNDERLINE}Skipping...{Colors.END}"
                 )
                 config_toml(target, False, args.native)
@@ -367,7 +374,7 @@ def main(args: argparse.Namespace):
 
     if args.upx:
         if args.dev:
-            warning_message(
+            Colors.warning_message(
                 f"Cannot {Colors.UNDERLINE}compress{Colors.END} in development mode."
             )
         else:
@@ -377,14 +384,14 @@ def main(args: argparse.Namespace):
 
     if args.run:
         if args.release:
-            info_message("Running...")
+            Colors.info_message("Running...")
             try:
                 run(target)
             except FileNotFoundError:
                 error_message("Executable not found.", True)
-            info_message("Exiting...")
+            Colors.info_message("Exiting...")
         else:
-            warning_message(
+            Colors.warning_message(
                 f"Cannot {Colors.UNDERLINE}run{Colors.END} in development mode."
             )
 
