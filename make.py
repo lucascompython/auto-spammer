@@ -64,7 +64,7 @@ def parse_args() -> argparse.Namespace:
         "-t",
         "--target",
         type=str,
-        help="The target platform to build for.",
+        help=f"The target platform to build for. Default: Current OS ({Colors.BOLD + OS + Colors.END}).",
         choices=("win", "linux"),
         default=OS,
     )
@@ -78,7 +78,7 @@ def parse_args() -> argparse.Namespace:
         "-ru",
         "--run",
         action="store_true",
-        help="Run the program. If build can also run after compiling.",
+        help="Run the program. If building will run after compiling.",
     )
     parser.add_argument(
         "-m",
@@ -93,14 +93,14 @@ def parse_args() -> argparse.Namespace:
         help=f"Use the {Colors.ITALIC}'target-cpu=native'{Colors.END} RUSTFLAG.",
     )
     parser.add_argument(
-        "-pnpm",
+        "-front",
         nargs="*",
-        help=f"Run {Colors.BOLD}pnpm{Colors.END} commands in {Colors.UNDERLINE}src-frontend{Colors.END}.",
+        help=f"Run commands in {Colors.UNDERLINE}src-frontend{Colors.END}.",
     )
     parser.add_argument(
-        "-cargo",
+        "-back",
         nargs="*",
-        help=f"Run {Colors.BOLD}cargo{Colors.END} commands in {Colors.UNDERLINE}src-tauri{Colors.END}.",
+        help=f"Run commands in {Colors.UNDERLINE}src-tauri{Colors.END}.",
     )
     smallest = parser.add_mutually_exclusive_group()
     smallest.add_argument(
@@ -229,7 +229,7 @@ def convert_bytes(num: int | float | str) -> str:
     return f"{num:.1f} PB"
 
 
-def get_size(mode: str, target: str):
+def get_size(mode: str, target: str) -> None:
     try:
         size = os.path.getsize(
             f"src-tauri/target/{target + '/release' if mode == 'release' else 'debug'}/autospammer"
@@ -291,14 +291,15 @@ def run(target: str) -> None:
         )  # Most of the times no accurate at all.
 
 
-def main(args: argparse.Namespace):
-    if args.pnpm:
+def main(args: argparse.Namespace) -> None:
+    if args.front:
         subprocess.run(
-            ["pnpm" + ".cmd" * (OS == "win"), *args.pnpm], cwd="src-frontend"
+            args.front,
+            cwd="src-frontend",
         )
         return
-    if args.cargo:
-        subprocess.run(["cargo", *args.cargo], cwd="src-tauri")
+    if args.back:
+        subprocess.run(args.back, cwd="src-tauri")
         return
 
     if args.smallest:

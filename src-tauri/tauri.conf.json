@@ -2,7 +2,7 @@
   "build": {
     "beforeBuildCommand": "cd src-frontend && pnpm run build",
     "beforeDevCommand": "cd src-frontend && pnpm run dev",
-    "devPath": "http://localhost:3000",
+    "devPath": "http://localhost:4321",
     "distDir": "../src-frontend/dist"
   },
   "package": {
