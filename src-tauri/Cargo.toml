@@ -12,12 +12,12 @@ rust-version = "1.60"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [build-dependencies]
-tauri-build = { version = "1.4.0", features = [] }
+tauri-build = { version = "1.5.0", features = [] }
 
 [dependencies]
-serde_json = "1.0.107"
-serde = { version = "1.0.188", features = ["derive"] }
-tauri = { version = "1.4.1", features = [
+serde_json = "1.0.108"
+serde = { version = "1.0.190", features = ["derive"] }
+tauri = { version = "1.5.2", features = [
     "global-shortcut-all",
     "objc-exception",
     "shell-open",

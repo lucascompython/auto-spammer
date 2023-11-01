@@ -10,15 +10,15 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/check": "^0.2.0",
-    "@astrojs/svelte": "^4.0.2",
-    "@tauri-apps/api": "^1.4.0",
-    "astro": "^3.0.13",
-    "astro-compress": "^2.0.15",
+    "@astrojs/check": "^0.3.0",
+    "@astrojs/svelte": "^4.0.3",
+    "@tauri-apps/api": "^1.5.1",
+    "astro": "^3.4.2",
+    "astro-compress": "^2.2.0",
     "typescript": "^5.2.2",
-    "svelte": "^4.2.0"
+    "svelte": "^4.2.2"
   },
   "devDependencies": {
-    "svelte-check": "^3.5.1"
+    "svelte-check": "^3.5.2"
   }
 }
