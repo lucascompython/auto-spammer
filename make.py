@@ -1,220 +1,202 @@
 #!/usr/bin/env python3
+
 import argparse
 import os
-import subprocess
 import sys
-from shutil import rmtree
+import subprocess
 from time import perf_counter
+from shutil import rmtree
 
 OS = sys.platform
 if OS == "win32":
-    OS = "win"
+    OS = "windows"
+VERBOSE = False
 
 
 class Colors:
-    RED: str = "\033[91m"
-    GREEN: str = "\033[92m"
-    YELLOW: str = "\033[93m"
-    BLUE: str = "\033[94m"
-    PURPLE: str = "\033[95m"
-    CYAN: str = "\033[96m"
-    WHITE: str = "\033[97m"
-    BOLD: str = "\033[1m"
-    UNDERLINE: str = "\033[4m"
-    ITALIC: str = "\033[3m"
-    END: str = "\033[0m"
+    """ANSI color codes."""
+    RED = "\033[91m"
+    GREEN = "\033[92m"
+    YELLOW = "\033[93m"
+    BLUE = "\033[94m"
+    MAGENTA = "\033[95m"
+    CYAN = "\033[96m"
+    BOLD = "\033[1m"
+    UNDERLINE = "\033[4m"
+    ITALIC = "\033[3m"
+    END = "\033[0m"
 
     @classmethod
-    def warning_message(cls, message: str) -> None:
-        print(f"{cls.YELLOW}WARNING:{cls.END} {message}")
-
+    def warning_message(cls, message: str) -> str:
+        return f"{cls.YELLOW}{cls.BOLD}WARNING:{cls.END} {message}"
+    
     @classmethod
-    def info_message(cls, message: str) -> None:
-        print(f"{cls.BLUE}INFO:{cls.END} {message}")
-
+    def error_message(cls, message: str) -> str:
+        return f"{cls.RED}{cls.BOLD}ERROR:{cls.END} {message}"
+    
     @classmethod
-    def success_message(cls, message: str) -> None:
-        print(f"{cls.GREEN}SUCCESS:{cls.END} {message}")
+    def success_message(cls, message: str) -> str:
+        return f"{cls.GREEN}{cls.BOLD}Sucess:{cls.END} {message}"
+    
+    @classmethod
+    def info_message(cls, message: str) -> str:
+        return f"{cls.BLUE}{cls.BOLD}INFO:{cls.END} {message}"
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(
-        description=f"Build script for {Colors.UNDERLINE}Auto Spammer{Colors.END}."
-    )
+    parser = argparse.ArgumentParser(description=f"{Colors.UNDERLINE}Auto-Spammer{Colors.END} build script.")
 
-    parser.add_argument(
-        "-d", "--dev", action="store_true", help="Run in development mode."
-    )
-    parser.add_argument(
-        "-r", "--release", action="store_true", help="Build in release mode."
-    )
-    parser.add_argument(
-        "-c",
-        "--clean",
-        action="store_true",
-        help=f"Clean the {Colors.UNDERLINE}build{Colors.END} directory, {Colors.UNDERLINE}node_modules{Colors.END} and {Colors.UNDERLINE}dist{Colors.END} directory.",
-    )
-    parser.add_argument(
-        "-u",
-        "--upx",
-        action="store_true",
-        help=f"{Colors.YELLOW}UNSTABLE:{Colors.END} Compress the executable with {Colors.UNDERLINE}UPX{Colors.END}. Might flag the app as virus.",
-    )
-    parser.add_argument(
-        "-t",
-        "--target",
-        type=str,
-        help=f"The target platform to build for. Default: Current OS ({Colors.BOLD + OS + Colors.END}).",
-        choices=("win", "linux"),
-        default=OS,
-    )
-    parser.add_argument(
-        "-n",
-        "--nightly",
-        action="store_true",
-        help=f"{Colors.YELLOW}UNSTABLE:{Colors.END} Use the {Colors.UNDERLINE}nightly{Colors.END} toolchain for a smaller binary size.",
-    )
-    parser.add_argument(
-        "-ru",
-        "--run",
-        action="store_true",
-        help="Run the program. If building will run after compiling.",
-    )
-    parser.add_argument(
-        "-m",
-        "--mold",
-        action="store_true",
-        help=f"Use {Colors.BOLD}MOLD{Colors.END} linker only for {Colors.UNDERLINE}Linux{Colors.END}.",
-    )
-    parser.add_argument(
-        "-na",
-        "--native",
-        action="store_true",
-        help=f"Use the {Colors.ITALIC}'target-cpu=native'{Colors.END} RUSTFLAG.",
-    )
-    parser.add_argument(
-        "-front",
-        nargs="*",
-        help=f"Run commands in {Colors.UNDERLINE}src-frontend{Colors.END}.",
-    )
-    parser.add_argument(
-        "-back",
-        nargs="*",
-        help=f"Run commands in {Colors.UNDERLINE}src-tauri{Colors.END}.",
-    )
-    smallest = parser.add_mutually_exclusive_group()
-    smallest.add_argument(
-        "-s",
-        "--smallest",
-        action="store_true",
-        help=f"Build the smallest binary possible. {Colors.UNDERLINE}UPX{Colors.END} and {Colors.UNDERLINE}nightly{Colors.END} are enabled.",
-    )
+    parser.add_argument("-d", "--dev", action="store_true", help="Run in development mode.")
+    parser.add_argument("-r", "--release", action="store_true", help="Run in release mode.")
+    parser.add_argument("-c", "--clean", action="store_true", help="Cleans the build directories and dependencies.")
+    parser.add_argument("-v", "--verbose", action="store_true", help="Prints verbose output.")
+    parser.add_argument("-u", "--upx", action="store_true", help=Colors.warning_message("WARNING:  Compress the executable using UPX. Might cause false positives in some antivirus software."))
+    parser.add_argument("-t", "--target", type=str, help=f"The target platform to build for. Default: {Colors.BOLD + OS + Colors.END} (current OS)", choices=("windows", "linux"), default=OS)
+    parser.add_argument("-n", "--nightly", action="store_true", help=Colors.warning_message(f"WARNING:  Build using the {Colors.UNDERLINE} nightly {Colors.END} toolchain for a smaller binary size."))
+    parser.add_argument("--run", action="store_true", help="Run the executable after building.")
+    parser.add_argument("--native", action="store_true", help=f"Build using the {Colors.ITALIC} 'target-cpu=native' {Colors.END} flag. This will optimize the binary for the current CPU architecture.")
+    parser.add_argument("-s", "--smallest", action="store_true", help="Build the smallest possible binary size")
+
     return parser.parse_args()
 
+def verbose_print(message) -> None:
+    if VERBOSE:
+        print(message)
 
-def error_message(message: str, exit: bool = False) -> None:
-    sys.stderr.write(f"{Colors.RED}ERROR:{Colors.END} {message}\n")
-    if exit:
+
+def run_command(command: tuple[str], **kwargs) -> None:  
+    try:
+        if VERBOSE:
+            subprocess.run(command, check=True, **kwargs)
+        else:
+            with open(os.devnull, "w") as devnull:
+                subprocess.Popen(command, stdout=devnull, stderr=devnull, **kwargs).wait()
+
+    except subprocess.CalledProcessError as e:
+        sys.stderr.write(f"{Colors.error_message(f'{e}')}\n")
         sys.exit(1)
 
 
-def check_node_modules() -> None:
-    if not os.path.isdir("src-frontend/node_modules"):
-        Colors.info_message("Installing frontend dependencies...")
-        subprocess.run(["pnpm" + ".cmd" * (OS == "win"), "install"], cwd="src-frontend")
-
-
-def build_tauri(target: str, mode: str, nightly: bool) -> None:
-    if mode == "dev":
-        Colors.info_message("Building in development mode...")
-        subprocess.run(["cargo", "tauri", "dev"], cwd="src-tauri")
-    elif mode == "release":
-        start = perf_counter()
-        Colors.info_message("Building in release mode...")
-        args = ["cargo", "tauri", "build", "--target", target]
-        if nightly:
-            args.extend(
-                [
-                    "--",
-                    "-Z",
-                    "build-std=std,panic_abort",
-                    "-Z",
-                    "build-std-features=panic_immediate_abort",
-                ]
-            )
-        tauri = subprocess.run(args, cwd="src-tauri")
-        if tauri.returncode != 0:
-            error_message(
-                f"Tauri failed to build after {Colors.BOLD}{perf_counter() - start:.2f}{Colors.END} seconds.",
-            )
-        else:
-            Colors.success_message(
-                f"Built in {Colors.BOLD}{perf_counter() - start:.2f}{Colors.END} seconds!"
-            )
-    else:
-        error_message("Invalid build mode.", True)
-
 
 def clean() -> None:
-    Colors.info_message("Cleaning...")
-    start = perf_counter()
-    subprocess.run(["cargo", "clean"], cwd="src-tauri")
+    print(Colors.info_message("Cleaning build directories and dependencies..."))
+    if VERBOSE:
+        start = perf_counter()
+
+    run_command(("cargo", "clean"), cwd="src-tauri")
+
     try:
         rmtree("src-frontend/dist")
     except FileNotFoundError:
-        Colors.info_message(
-            f"{Colors.BOLD}dist{Colors.END} directory not found. {Colors.UNDERLINE}Skipping...{Colors.END}"
-        )
+        pass
+    
     try:
         rmtree("src-frontend/node_modules")
     except FileNotFoundError:
-        Colors.info_message(
-            f"{Colors.BOLD}node_modules{Colors.END} directory not found. {Colors.UNDERLINE}Skipping...{Colors.END}"
+        pass
+    
+    if VERBOSE:
+        end = perf_counter()
+        print(f"{Colors.success_message(f'Cleaned build directories and dependencies in {end - start:.2f} seconds.')}\n")
+        
+
+
+
+
+
+def check_node_modules() -> None:   
+    if not os.path.exists("src-frontend/node_modules"):
+        print(Colors.info_message("Installing frontend dependencies..."))
+        run_command(("bun", "install"), cwd="src-frontend")
+    
+
+def is_mingw_installed() -> bool:
+    try:
+        subprocess.run(
+            ("gcc", "--version"),
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            check=True,
         )
+        return True
+    except FileNotFoundError:
+        return False
+    except subprocess.CalledProcessError:
+        return False
 
-    Colors.success_message(
-        f"Cleaned in {Colors.BOLD}{perf_counter() - start:.2f}{Colors.END} seconds!"
-    )
+def get_target(target: str) -> str:
 
+    if target == "linux":
+        return "x86_64-unknown-linux-gnu"
+    elif target == "linux" and OS == "windows":
+        if is_mingw_installed():
+            return "x86_64-unknown-linux-gnu"
+        return "x86_64-unknown-linux-musl"
 
-def upx(target: str) -> None:
-    Colors.warning_message("Using UPX may flag your executable as a virus.")
-    Colors.info_message("Compressing executable with UPX...")
-    start = perf_counter()
-    u = subprocess.run(
-        [
-            "upx",
-            "--ultra-brute",
-            f"src-tauri/target/{target}/release/autospammer"
-            + ".exe" * ("windows" in target),
-        ],
-    )
-    if u.returncode != 0:
-        error_message(
-            f"Compression failed after {Colors.BOLD}{perf_counter() - start:.2f}{Colors.END} seconds.",
-        )
+    elif target == "windows" and OS == "linux":
+        return "x86_64-pc-windows-gnu"
+
+    elif target == "windows" and OS == "windows":
+        if is_mingw_installed():
+            return "x86_64-pc-windows-gnu"
+        
+        return "x86_64-pc-windows-msvc"
+    
     else:
-        Colors.success_message(
-            f"Compression complete in {Colors.BOLD}{perf_counter() - start:.2f}{Colors.END} seconds!"
+        sys.stderr.write(f"{Colors.error_message(f"Invalid target: {target}.")}\n")
+        sys.exit(1)
+
+def get_app_name(target: str) -> str:
+    app_name = "auto-spammer"
+    if target == "windows":
+        app_name += ".exe"
+
+    return app_name
+
+def build_release(args: argparse.Namespace) -> None:    
+    print(Colors.info_message("Building in release mode..."))
+    check_node_modules()
+
+    target = get_target(args.target)
+
+    if args.smallest:
+        args.nightly = True
+        args.upx = True
+
+    command = ["cargo", "tauri", "build", f"--target {target}"]  
+    rustflags = []
+
+    if "msvc" in target:
+        rustflags.append("-C target-feature=+crt-static") # Make sure the binary is statically linked
+        rustflags.append("-C linker=rust-lld")
+
+    if args.nightly:    
+        command.insert(1, "+nightly")
+        rustflags.append("-Zlocation-detail=none")
+
+        command.extend([
+            "--",
+            "-Z",
+            "build-std=std,panic_abort",
+            "-Z",
+            "build-std-features=panic_immediate_abort",
+        ])
+    
+    if args.native:
+        rustflags.append("-C target-cpu=native")
+    
+    run_command(f"RUSTFLAGS='{" ".join(rustflags)}' " + " ".join(command), cwd="src-tauri",  shell=True)
+
+    if args.upx:
+        print(Colors.info_message("Compressing executable using UPX..."))
+
+        run_command(
+            (
+                "upx",
+                "--ultra-brute",
+                f"src-tauri/target/{target}/release/{get_app_name(args.target)}",
+            )
         )
-
-
-def config_toml(target: str, mold: bool = False, native: bool = False) -> None:
-    os.mkdir("src-tauri/.cargo")
-    with open("src-tauri/.cargo/config.toml", "w") as f:
-        f.write(f"[target.{target}]\n")
-
-        if mold and native:
-            f.write(
-                "linker = 'clang'\nrustflags = ['-C', 'target-cpu=native', '-C', 'link-arg=-fuse-ld=/usr/bin/mold']"
-            )
-        if mold and not native:
-            f.write(
-                "linker = 'clang'\nrustflags = ['-C', 'link-arg=-fuse-ld=/usr/bin/mold']"
-            )
-        if native and not mold:
-            f.write("rustflags = ['-C', 'target-cpu=native']")
-
 
 def convert_bytes(num: int | float | str) -> str:
     if isinstance(num, str):
@@ -228,182 +210,92 @@ def convert_bytes(num: int | float | str) -> str:
         num /= 1024.0
     return f"{num:.1f} PB"
 
+def get_size(target: str) -> str:
+    target = get_target(target)
+    app_name = get_app_name(target)
 
-def get_size(mode: str, target: str) -> None:
+
     try:
-        size = os.path.getsize(
-            f"src-tauri/target/{target + '/release' if mode == 'release' else 'debug'}/autospammer"
-            + (".exe" if "win" in target else "")
-        )
-        print(
-            f"\n{Colors.BOLD}Executable size:{Colors.END} {Colors.CYAN + convert_bytes(size) + Colors.END}"
-        )
+        size = os.path.getsize(f"src-tauri/target/{target}/release/{app_name}")
+        return convert_bytes(size)
     except FileNotFoundError:
-        Colors.warning_message("Cannot get executable size.")
+        print(Colors.warning_message(f"Executable not found at {Colors.UNDERLINE}src-tauri/target/{target}/release/{app_name}{Colors.END}."))
+        return "N/A"
 
 
-def run(target: str) -> None:
-    args = [
-        f"./src-tauri/target/{target}/release/autospammer" + ".exe" * ("win" in target)
-    ]
-    fail = False
+def run_app(target: str) -> None:
+    if OS != target:
+        print(Colors.warning_message(f"Cannot run {target} executable on {OS}."))
+        return
+
+    app_path = f"./src-tauri/target/{get_target(target)}/release/{get_app_name(target)}"
+
+
     if OS == "linux":
-        # check if /usr/bin/time exists
-        if not os.path.isfile("/usr/bin/time"):
-            fail = True
-            Colors.warning_message(
-                "GNU time command not found. Cannot get memory usage."
-            )
-        else:
-            args = [
-                "/usr/bin/time",
-                "-f",
-                '"%M"',
-                *args,
-            ]  # uses the GNU time command to get memory usage
-    elif OS == "win":  # Windows sucks, and I hope it dies.
-        args = [
+        command = ["/usr/bin/time", "-f", "'%M'", app_path]
+    elif OS == "windows":
+        #command = ["powershell", "-Command", f"Measure-Command {{ {command} }}"]
+        command = [
             "powershell",
             "-ExecutionPolicy",
             "Bypass",
             "-File",
-            "./get_peak_mem.ps1",
-            *args,
+            "get_peak_mem.ps1",
+            app_path
         ]
+    else:
+        sys.stderr.write(f"{Colors.error_message(f"Unsupported OS: {OS}.")}\n")
+        sys.exit(1)
+    
+    print(Colors.info_message(f"Running {app_path}..."))
+    proc = subprocess.run(command, capture_output=True)
 
-    p = subprocess.run(args, capture_output=True)
-    if p.returncode != 0:
-        error_message("Failed to run executable.", True)
+    if proc.returncode != 0:
+        sys.stderr.write(f"{Colors.error_message(f"Error running {app_path}.")}\n")
+        sys.exit(1)
+    
+    if OS == "linux":
+        peak_mem = proc.stderr.decode().strip().replace("'", "")
+    else:
+        peak_mem = proc.stdout.decode().strip()
 
-    if OS == "linux" and not fail:
-        mem = (
-            p.stderr.decode().strip().replace('"', "")
-        )  # returns the memory usage in KB
-        mem = convert_bytes(mem + "000")
-        print(
-            f"{Colors.BOLD}Peak memory usage:{Colors.END} {Colors.CYAN}{mem}{Colors.END}"
-        )
-    elif OS == "win" and not fail:
-        mem = p.stdout.decode().strip().replace('"', "")
-        mem = convert_bytes(mem)
-        print(
-            f"{Colors.BOLD}Peak memory usage:{Colors.END} {Colors.CYAN}~{mem}{Colors.END}"
-        )  # Most of the times no accurate at all.
+    peak_mem = convert_bytes(peak_mem + "000" if OS == "linux" else "")
 
+    print(Colors.info_message(f"Peak Memory Usage: {Colors.BOLD}{peak_mem}{Colors.END}"))
 
-def main(args: argparse.Namespace) -> None:
-    if args.front:
-        subprocess.run(
-            args.front,
-            cwd="src-frontend",
-        )
-        return
-    if args.back:
-        subprocess.run(args.back, cwd="src-tauri")
-        return
-
-    if args.smallest:
-        args.release = True
-        args.upx = True
-        args.nightly = True
-
-    if args.clean:
-        clean()
-
-    target = args.target
-    if target == "linux":
-        target = "x86_64-unknown-linux-gnu"
-    elif target == "win" and OS == "linux":
-        target = "x86_64-pc-windows-gnu"
-    elif target == "win" and OS == "win":
-        target = "x86_64-pc-windows-msvc"
-
-    if args.dev:
-        mode = "dev"
-    elif args.release:
-        mode = "release"
-
-    if not args.dev and not args.release:
-        if args.clean:  # if we're cleaning and don't specify a build mode, we're done
-            return
-
-        if args.upx:
-            upx(target)
-            get_size("release", target)
-            return
-
-        if args.run:
-            get_size("release", target)
-            run(target)
-            return
-        error_message("You must specify either --dev or --release.", True)
+def main() -> None:
+    args = parse_args()
+    global VERBOSE
+    VERBOSE = args.verbose
 
     if args.dev and args.release:
-        error_message("You cannot specify both --dev and --release.", True)
+        sys.stderr.write(f"{Colors.error_message('Cannot use both --dev and --release flags at the same time.')}\n")
+        sys.exit(1)
+    
+    if args.clean: 
+        clean()
 
-    if args.nightly:
-        Colors.warning_message(
-            "Using the nightly toolchain is unstable and may cause issues."
-        )
 
-    if args.native:
-        Colors.warning_message(
-            "Using the 'target-cpu=native' RUSTFLAG may cause issues on other machines."
-        )
+    if args.dev:
+        print(Colors.info_message("Building in development mode..."))
+        check_node_modules() 
+        VERBOSE = True # Always print output in development mode
+        run_command(("cargo", "tauri", "dev"), cwd="src-tauri")  
+        VERBOSE = args.verbose # Reset verbosity to user's preference
 
-    check_node_modules()
-    try:
-        if args.nightly:
-            os.rename("src-tauri/.rust-toolchain.toml", "src-tauri/rust-toolchain.toml")
-
-        if args.mold or args.native:
-            if args.mold and target != "x86_64-unknown-linux-gnu":
-                Colors.warning_message(
-                    f"{Colors.BOLD}Mold{Colors.END} is only available on Linux. {Colors.UNDERLINE}Skipping...{Colors.END}"
-                )
-                config_toml(target, False, args.native)
-            else:
-                config_toml(target, args.mold, args.native)
-
-        build_tauri(target, mode, args.nightly)
-    finally:
-        if args.nightly:  # to not use nightly for the next build
-            os.rename("src-tauri/rust-toolchain.toml", "src-tauri/.rust-toolchain.toml")
-
-        if args.mold or args.native:
-            rmtree("src-tauri/.cargo")
-
-    if args.upx:
-        if args.dev:
-            Colors.warning_message(
-                f"Cannot {Colors.UNDERLINE}compress{Colors.END} in development mode."
-            )
-        else:
-            upx(target)
-
-    get_size(mode, target)
+    elif args.release or args.smallest:
+        build_release(args)
+        print(Colors.info_message(f"{Colors.BOLD}Executable Size: {get_size(args.target)}"))
 
     if args.run:
-        if args.release:
-            Colors.info_message("Running...")
-            try:
-                run(target)
-            except FileNotFoundError:
-                error_message("Executable not found.", True)
-            Colors.info_message("Exiting...")
-        else:
-            Colors.warning_message(
-                f"Cannot {Colors.UNDERLINE}run{Colors.END} in development mode."
-            )
+        run_app(args.target)
 
 
 if __name__ == "__main__":
     try:
-        args = parse_args()
-        main(args)
+        main()
     except KeyboardInterrupt:
-        print(f"\n{Colors.PURPLE}Program interrupted by user. Quitting..{Colors.END}\n")
+        print(f"\n{Colors.MAGENTA}Exiting...{Colors.END}")
 else:
-    error_message(
-        f"{Colors.BOLD}{__name__}{Colors.END} is not the main module.\n", True
-    )
+    sys.stderr.write(f"{Colors.error_message('This script cannot be imported.')}\n")
+    sys.exit(1)

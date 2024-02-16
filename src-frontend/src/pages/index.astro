@@ -1,98 +1,49 @@
 ---
-import Layout from "@layouts/Layout.astro";
-import Teste from "@components/teste.svelte";
+import Layout from "../layouts/Layout.astro";
 ---
 
-<Layout title="Auto-Spammer.">
+<Layout title="Welcome to Astro.">
   <main>
-    <div class="row">
-      <a href="https://github.com/lucascompython/auto-spammer" target="_blank">
-        <img
-          src="/icon.png"
-          class="logo auto-spammer dark-mode-only"
-          alt="Auto Spammer logo"
-        />
-      </a>
-    </div>
-    <h2><strong>Auto-Spammer, a Macro Utility</strong></h2>
-    <Teste client:only />
-    <div class="row">
-      <form>
-        <input id="input1" type="text" placeholder="K" />
-        <input id="input2" type="text" placeholder="type:Hello World" />
-        <br />
-        <button type="submit">Apply</button>
-      </form>
-    </div>
+    <h1>
+      Welcome to <span class="text-gradient">Auto-Spammer</span>
+    </h1>
   </main>
 </Layout>
-<footer>
-  <div class="socials">
-    <a href="https://github.com/lucascompython/" target="_blank">
-      <img src="/github.svg" alt="github" class="social" />
-    </a>
-    <a href="https://discordapp.com/users/325986670824652800" target="_blank">
-      <img src="/discord.svg" alt="discord" class="social" />
-    </a>
-  </div>
-  <div class="row">
-    <p>
-      <a
-        target="_blank"
-        href="https://github.com/lucascompython/auto-spammer/wiki"
-      >
-        Need Help?
-      </a>
-    </p>
-  </div>
-</footer>
 
 <style>
   main {
-    margin: 0;
-    padding-top: 10vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    margin: auto;
+    padding: 1rem;
+    max-width: calc(100% - 2rem);
+    color: white;
+    font-size: 20px;
+    line-height: 1.6;
+  }
+
+  h1 {
+    font-size: 4rem;
+    font-weight: 700;
+    line-height: 1;
     text-align: center;
+    margin-bottom: 1em;
   }
-
-  .logo.auto-spammer:hover {
-    filter: drop-shadow(0 0 2em gray);
-  }
-
-  #greet-input {
-    margin-right: 5px;
-  }
-
-  footer {
-    position: absolute;
-    width: 100%;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    margin: 0 auto;
-    text-align: center;
-  }
-  .social {
-    width: 48px;
-    height: 48px;
-    margin: 0 5px;
+  .text-gradient {
+    background-image: var(--accent-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-size: 400%;
+    background-position: 0%;
   }
 </style>
+
 <script>
-  import { register } from "@tauri-apps/api/globalShortcut";
-  import { invoke } from "@tauri-apps/api/tauri";
+  import { register } from "@tauri-apps/plugin-global-shortcut";
+  import { register } from "../../node_modules/@tauri-apps/plugin-global-shortcut";
+  // import { invoke } from "@tauri-apps/api/tauri";
+  import { invoke } from "../../node_modules/@tauri-apps/api/";
 
-  await register("F6", async () => {
+  await register("p", async () => {
     await invoke("type_string", { string: "Hello World!" });
-  });
-
-  await register("F7", async () => {
-    await invoke("type_string", { string: "morre longe seu fdp!" });
-  });
-
-  await register("F5", async () => {
-    await invoke("autoclicker", { speed: 100 });
+    // change the color of the background
   });
 </script>
