@@ -52,7 +52,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("-v", "--verbose", action="store_true", help="Prints verbose output.")
     parser.add_argument("-u", "--upx", action="store_true", help=Colors.warning_message("WARNING:  Compress the executable using UPX. Might cause false positives in some antivirus software."))
     parser.add_argument("-t", "--target", type=str, help=f"The target platform to build for. Default: {Colors.BOLD + OS + Colors.END} (current OS)", choices=("windows", "linux"), default=OS)
-    parser.add_argument("-n", "--nightly", action="store_true", help=Colors.warning_message(f"WARNING:  Build using the {Colors.UNDERLINE} nightly {Colors.END} toolchain for a smaller binary size."))
+    parser.add_argument("-n", "--nightly", action="store_true", help=Colors.warning_message(f"WARNING:  Build using the {Colors.UNDERLINE}nightly{Colors.END} toolchain for a smaller binary size."))
     parser.add_argument("--run", action="store_true", help="Run the executable after building.")
     parser.add_argument("--native", action="store_true", help=f"Build using the {Colors.ITALIC} 'target-cpu=native' {Colors.END} flag. This will optimize the binary for the current CPU architecture.")
     parser.add_argument("-s", "--smallest", action="store_true", help="Build the smallest possible binary size")
@@ -125,7 +125,6 @@ def is_mingw_installed() -> bool:
         return False
 
 def get_target(target: str) -> str:
-
     if target == "linux":
         return "x86_64-unknown-linux-gnu"
     elif target == "linux" and OS == "windows":
@@ -265,6 +264,11 @@ def run_app(target: str) -> None:
 
 def main() -> None:
     args = parse_args()
+
+    if len(sys.argv) == 1:
+        sys.argv.append("-h")
+        args = parse_args()
+
     global VERBOSE
     VERBOSE = args.verbose
 

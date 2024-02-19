@@ -12,7 +12,8 @@ tauri-build = { version = "2.0.0-beta", features = [] }
 
 [dependencies]
 tauri = { version = "2.0.0-beta", features = [] }
-tauri-plugin-global-shortcut = "2.0.0-beta"
+# tauri-plugin-global-shortcut = "2.0.0-beta"
+tauri-plugin-global-shortcut = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v2" }
 enigo = { git = "https://github.com/enigo-rs/enigo" }
 
 serde_json = "1.0"
