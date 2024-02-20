@@ -280,10 +280,9 @@ def main() -> None:
 
     elif args.release:
         start = perf_counter()
-        if OS == "windows":
-            if args.mingw:
-                global USE_MINGW
-                USE_MINGW = True
+        if OS == "windows" and args.mingw:
+            global USE_MINGW
+            USE_MINGW = True
         upx_time = build_release(args)
         total_time = perf_counter() - start
         if upx_time:
