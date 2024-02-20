@@ -150,7 +150,7 @@ def build_release(args: argparse.Namespace) -> float | None:
 
     if "msvc" in target:
         rustflags.append("-C target-feature=+crt-static") # Make sure the binary is statically linked
-        rustflags.append("-C linker=rust-lld")
+        # rustflags.append("-C linker=rust-lld")
 
     if args.nightly:    
         command.insert(1, "+nightly")

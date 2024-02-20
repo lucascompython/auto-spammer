@@ -37,14 +37,69 @@ import Layout from "../layouts/Layout.astro";
 </style>
 
 <script>
-  import { register } from "@tauri-apps/plugin-global-shortcut";
-  // import { register } from "../../node_modules/@tauri-apps/plugin-global-shortcut";
+  import {
+    register,
+    registerAll,
+    isRegistered,
+    unregister,
+  } from "@tauri-apps/plugin-global-shortcut";
   import { invoke } from "@tauri-apps/api/core";
-  // import { invoke } from "../../node_modules/@tauri-apps/api/";
 
-  await register("p", async () => {
-    console.log("OLA");
-    await invoke("type_string", { string: "Hello World!" });
-    // change the color of the background
-  });
+  function countOccurences(str: string, char: string): number {
+    return str.split(char).length - 1;
+  }
+
+  let str = "Hello from Astro";
+  let count_to_ignore = 0;
+
+  // await register("o", async () => {
+  //   if (count_to_ignore === 0) {
+  //     await invoke("type_string", {
+  //       string: str,
+  //     });
+  //     count_to_ignore = countOccurences(str, "o");
+  //   } else {
+  //     count_to_ignore--;
+  //   }
+  // });
+
+  // async function handleOKey() {
+  //   if (count_to_ignore > 0) {
+  //     count_to_ignore--;
+  //   } else {
+  //     count_to_ignore = countOccurences(str, "o");
+  //     await unregister("o");
+  //     await new Promise((resolve) => setTimeout(resolve, 100));
+  //     await invoke("type_string", {
+  //       string: str,
+  //     });
+  //     await register("o", handleOKey);
+  //   }
+  // }
+
+  // await register("o", handleOKey);
+
+  let isRegistering = false;
+
+  async function handleOKey() {
+    if (isRegistering) {
+      return;
+    }
+
+    if (count_to_ignore > 0) {
+      count_to_ignore--;
+    } else {
+      count_to_ignore = countOccurences(str, "o");
+      isRegistering = true;
+      await unregister("o");
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      await invoke("type_string", {
+        string: str,
+      });
+      await register("o", handleOKey);
+      isRegistering = false;
+    }
+  }
+
+  await register("o", handleOKey);
 </script>

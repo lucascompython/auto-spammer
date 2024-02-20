@@ -1,1 +1,1 @@
-{}
+{"desktop-capability":{"identifier":"desktop-capability","description":"","context":"local","windows":["main"],"permissions":["global-shortcut:allow-register","global-shortcut:allow-unregister"],"platforms":["linux","macOS","windows"]}}
