@@ -11,6 +11,7 @@ OS = sys.platform
 if OS == "win32":
     OS = "windows"
 VERBOSE = False
+USE_MINGW = False
 
 
 class Colors:
@@ -36,7 +37,7 @@ class Colors:
     
     @classmethod
     def success_message(cls, message: str) -> str:
-        return f"{cls.GREEN}{cls.BOLD}Sucess:{cls.END} {message}"
+        return f"{cls.GREEN}{cls.BOLD}SUCESS:{cls.END} {message}"
     
     @classmethod
     def info_message(cls, message: str) -> str:
@@ -46,16 +47,17 @@ class Colors:
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=f"{Colors.UNDERLINE}Auto-Spammer{Colors.END} build script.")
 
-    parser.add_argument("-d", "--dev", action="store_true", help="Run in development mode.")
-    parser.add_argument("-r", "--release", action="store_true", help="Run in release mode.")
+    parser.add_argument("-d", "--dev", action="store_true", help="Build in development mode.")
+    parser.add_argument("-r", "--release", action="store_true", help="Build in release mode.")
     parser.add_argument("-c", "--clean", action="store_true", help="Cleans the build directories and dependencies.")
     parser.add_argument("-v", "--verbose", action="store_true", help="Prints verbose output.")
-    parser.add_argument("-u", "--upx", action="store_true", help=Colors.warning_message("WARNING:  Compress the executable using UPX. Might cause false positives in some antivirus software."))
+    parser.add_argument("-u", "--upx", action="store_true", help=Colors.warning_message(f"Compress the executable using {Colors.ITALIC}UPX{Colors.END}. Might cause false positives in some antivirus software."))
     parser.add_argument("-t", "--target", type=str, help=f"The target platform to build for. Default: {Colors.BOLD + OS + Colors.END} (current OS)", choices=("windows", "linux"), default=OS)
-    parser.add_argument("-n", "--nightly", action="store_true", help=Colors.warning_message(f"WARNING:  Build using the {Colors.UNDERLINE}nightly{Colors.END} toolchain for a smaller binary size."))
+    parser.add_argument("-n", "--nightly", action="store_true", help=Colors.warning_message(f"Build using the {Colors.UNDERLINE}nightly{Colors.END} toolchain for a smaller binary size. See {Colors.UNDERLINE}https://github.com/johnthagen/min-sized-rust{Colors.END}"))
     parser.add_argument("--run", action="store_true", help="Run the executable after building.")
-    parser.add_argument("--native", action="store_true", help=f"Build using the {Colors.ITALIC} 'target-cpu=native' {Colors.END} flag. This will optimize the binary for the current CPU architecture.")
-    parser.add_argument("-s", "--smallest", action="store_true", help="Build the smallest possible binary size")
+    parser.add_argument("--native", action="store_true", help=f"Build using the {Colors.ITALIC}'target-cpu=native'{Colors.END} flag. This will optimize the binary for the current CPU architecture.")
+    parser.add_argument("-s", "--smallest", action="store_true", help=f"Build the smallest possible binary size. Enables {Colors.ITALIC}--release{Colors.END}, {Colors.ITALIC}--upx{Colors.END}, and {Colors.ITALIC}--nightly{Colors.END}.")    
+    parser.add_argument("--mingw", action="store_true", help=f"Use {Colors.BOLD}MinGW{Colors.END} on Windows.")
 
     return parser.parse_args()
 
@@ -70,12 +72,15 @@ def run_command(command: tuple[str], **kwargs) -> None:
             subprocess.run(command, check=True, **kwargs)
         else:
             with open(os.devnull, "w") as devnull:
-                subprocess.Popen(command, stdout=devnull, stderr=devnull, **kwargs).wait()
+                p = subprocess.Popen(command, stdout=devnull, stderr=devnull, **kwargs).wait()
+                if p != 0:
+                    raise subprocess.CalledProcessError(p, command)
 
     except subprocess.CalledProcessError as e:
+        if not VERBOSE:
+            e = f"{e}\nRun with {Colors.ITALIC}--verbose{Colors.END} flag for more information."
         sys.stderr.write(f"{Colors.error_message(f'{e}')}\n")
         sys.exit(1)
-
 
 
 def clean() -> None:
@@ -99,36 +104,18 @@ def clean() -> None:
         end = perf_counter()
         print(f"{Colors.success_message(f'Cleaned build directories and dependencies in {end - start:.2f} seconds.')}\n")
         
-
-
-
-
-
 def check_node_modules() -> None:   
+    verbose_print(Colors.info_message("Checking for frontend dependencies..."))
     if not os.path.exists("src-frontend/node_modules"):
         print(Colors.info_message("Installing frontend dependencies..."))
         run_command(("bun", "install"), cwd="src-frontend")
     
 
-def is_mingw_installed() -> bool:
-    try:
-        subprocess.run(
-            ("gcc", "--version"),
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-            check=True,
-        )
-        return True
-    except FileNotFoundError:
-        return False
-    except subprocess.CalledProcessError:
-        return False
-
 def get_target(target: str) -> str:
     if target == "linux":
         return "x86_64-unknown-linux-gnu"
     elif target == "linux" and OS == "windows":
-        if is_mingw_installed():
+        if USE_MINGW:
             return "x86_64-unknown-linux-gnu"
         return "x86_64-unknown-linux-musl"
 
@@ -136,7 +123,7 @@ def get_target(target: str) -> str:
         return "x86_64-pc-windows-gnu"
 
     elif target == "windows" and OS == "windows":
-        if is_mingw_installed():
+        if USE_MINGW:
             return "x86_64-pc-windows-gnu"
         
         return "x86_64-pc-windows-msvc"
@@ -152,17 +139,13 @@ def get_app_name(target: str) -> str:
 
     return app_name
 
-def build_release(args: argparse.Namespace) -> None:    
+def build_release(args: argparse.Namespace) -> float | None:    
     print(Colors.info_message("Building in release mode..."))
     check_node_modules()
 
     target = get_target(args.target)
 
-    if args.smallest:
-        args.nightly = True
-        args.upx = True
-
-    command = ["cargo", "tauri", "build", f"--target {target}"]  
+    command = ["cargo", "tauri", "build", "--target", target]  
     rustflags = []
 
     if "msvc" in target:
@@ -184,9 +167,11 @@ def build_release(args: argparse.Namespace) -> None:
     if args.native:
         rustflags.append("-C target-cpu=native")
     
-    run_command(f"RUSTFLAGS='{" ".join(rustflags)}' " + " ".join(command), cwd="src-tauri",  shell=True)
+    env = os.environ.copy()
+    run_command(command, cwd="src-tauri", env={**env, "RUSTFLAGS": " ".join(rustflags)})
 
     if args.upx:
+        upx_start = perf_counter()
         print(Colors.info_message("Compressing executable using UPX..."))
 
         run_command(
@@ -196,6 +181,9 @@ def build_release(args: argparse.Namespace) -> None:
                 f"src-tauri/target/{target}/release/{get_app_name(args.target)}",
             )
         )
+        upx_time = perf_counter() - upx_start
+
+        return upx_time
 
 def convert_bytes(num: int | float | str) -> str:
     if isinstance(num, str):
@@ -210,8 +198,8 @@ def convert_bytes(num: int | float | str) -> str:
     return f"{num:.1f} PB"
 
 def get_size(target: str) -> str:
-    target = get_target(target)
     app_name = get_app_name(target)
+    target = get_target(target)
 
 
     try:
@@ -224,7 +212,7 @@ def get_size(target: str) -> str:
 
 def run_app(target: str) -> None:
     if OS != target:
-        print(Colors.warning_message(f"Cannot run {target} executable on {OS}."))
+        print(Colors.warning_message(f"Cannot run {Colors.BOLD + target.capitalize() + Colors.END} executable on {Colors.BOLD + OS.capitalize() + Colors.END}."))
         return
 
     app_path = f"./src-tauri/target/{get_target(target)}/release/{get_app_name(target)}"
@@ -233,7 +221,6 @@ def run_app(target: str) -> None:
     if OS == "linux":
         command = ["/usr/bin/time", "-f", "'%M'", app_path]
     elif OS == "windows":
-        #command = ["powershell", "-Command", f"Measure-Command {{ {command} }}"]
         command = [
             "powershell",
             "-ExecutionPolicy",
@@ -258,9 +245,9 @@ def run_app(target: str) -> None:
     else:
         peak_mem = proc.stdout.decode().strip()
 
-    peak_mem = convert_bytes(peak_mem + "000" if OS == "linux" else "")
+    peak_mem = convert_bytes(peak_mem + "000" if OS == "linux" else peak_mem)
 
-    print(Colors.info_message(f"Peak Memory Usage: {Colors.BOLD}{peak_mem}{Colors.END}"))
+    print(Colors.info_message(f"Peak Memory Usage: {Colors.BOLD}{peak_mem}{Colors.END}. {f'{Colors.ITALIC}Note: This {Colors.BOLD}IS{Colors.END} not really accurate, because, well, Windows sucks.{Colors.END}' if OS == 'windows' else ''}"))
 
 def main() -> None:
     args = parse_args()
@@ -271,9 +258,13 @@ def main() -> None:
 
     global VERBOSE
     VERBOSE = args.verbose
+    if args.smallest:
+        args.release = True
+        args.upx = True
+        args.nightly = True
 
     if args.dev and args.release:
-        sys.stderr.write(f"{Colors.error_message('Cannot use both --dev and --release flags at the same time.')}\n")
+        sys.stderr.write(f"{Colors.error_message(f'Cannot use both {Colors.ITALIC}--dev{Colors.END} and {Colors.ITALIC}--release{Colors.END} flags at the same time.')}\n")
         sys.exit(1)
     
     if args.clean: 
@@ -287,8 +278,19 @@ def main() -> None:
         run_command(("cargo", "tauri", "dev"), cwd="src-tauri")  
         VERBOSE = args.verbose # Reset verbosity to user's preference
 
-    elif args.release or args.smallest:
-        build_release(args)
+    elif args.release:
+        start = perf_counter()
+        if OS == "windows":
+            if args.mingw:
+                global USE_MINGW
+                USE_MINGW = True
+        upx_time = build_release(args)
+        total_time = perf_counter() - start
+        if upx_time:
+            print("\n" + Colors.info_message(f"Compilation Time: {total_time - upx_time:.2f} seconds."))
+            print(Colors.info_message(f"UPX Compression Time: {upx_time:.2f} seconds."))
+
+        print("\n" + Colors.success_message(f'{Colors.BOLD}Finished building in {perf_counter() - start:.2f} seconds.{Colors.END}'))
         print(Colors.info_message(f"{Colors.BOLD}Executable Size: {get_size(args.target)}"))
 
     if args.run:

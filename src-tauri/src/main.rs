@@ -1,5 +1,6 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+#![no_main]
 
 use enigo::Keyboard;
 use tauri::{plugin::Plugin, Manager};
@@ -14,6 +15,7 @@ fn type_string(string: String) {
     enigo.text("Hello, World!").unwrap();
 }
 
+#[no_mangle]
 fn main() {
     tauri::Builder::default()
         // .plugin(tauri_plugin_global_shortcut::init())
