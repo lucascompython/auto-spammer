@@ -3,16 +3,26 @@
 #![no_main]
 
 use enigo::{Keyboard, Mouse};
+use std::sync::Mutex;
 use tauri::{plugin::Plugin, Manager};
 use tauri_plugin_global_shortcut::{self, Code};
 use tauri_plugin_global_shortcut::{GlobalShortcutExt, Modifiers};
 
+// Enigo state
+struct EnigoState(Mutex<enigo::Enigo>);
+
 #[tauri::command]
-fn type_string(string: String) {
-    let mut enigo = enigo::Enigo::new(&enigo::Settings::default()).unwrap();
+fn type_string(state: tauri::State<EnigoState>, string: String) {
+    let mut enigo = state.0.lock().unwrap();
+
     // enigo.text(&string).unwrap();
-    println!("{}", string);
+    println!("ANTES: {}", string);
     enigo.text(&string).unwrap();
+
+    enigo
+        .key(enigo::Key::Return, enigo::Direction::Click)
+        .unwrap();
+    println!("DEPOIS: {}", string);
 }
 
 #[tauri::command]
@@ -35,23 +45,20 @@ fn main() {
             // app.handle()
             //     .plugin(tauri_plugin_global_shortcut::Builder::new().build())?;
             // Ok(())
+            app.manage(EnigoState(Mutex::new(enigo::Enigo::new(
+                &enigo::Settings::default(),
+            )?)));
 
             #[cfg(desktop)]
             app.handle().plugin(
                 tauri_plugin_global_shortcut::Builder::with_handler(move |app, shortcut| {
-                    let mut enigo = enigo::Enigo::new(&enigo::Settings::default()).unwrap();
+                    // let enigo = app.state::<EnigoState>();
+                    // let mut enigo = enigo.0.lock().unwrap();
 
-                    if shortcut.matches(Modifiers::empty(), Code::KeyP) {
-                        println!("PRESSED P");
-                        app.global_shortcut().unregister("p").unwrap_or_else(|e| {
-                            println!("Error unregistering shortcut: {}", e);
-                        });
-                        println!("DEPOSI");
-
-                        enigo.text("pa").unwrap();
-                        app.global_shortcut().register("p").unwrap();
-                        std::thread::sleep(std::time::Duration::from_millis(2000));
-                    }
+                    // if shortcut.matches(Modifiers::SHIFT, Code::KeyP) {
+                    //     println!("MATCHES");
+                    //     enigo.text("switch").unwrap();
+                    // }
 
                     // if shortcut.matches(Modifiers::empty(), Code::KeyO) {
                     //     enigo.text("view monitor").unwrap();
@@ -79,7 +86,7 @@ fn main() {
                 window.open_devtools();
             };
             // app.global_shortcut().register("o")?;
-            app.global_shortcut().register("p")?;
+            // app.global_shortcut().register("Shift+P")?;
 
             Ok(())
         })

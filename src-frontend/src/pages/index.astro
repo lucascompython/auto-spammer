@@ -1,14 +1,18 @@
 ---
-import Layout from "../layouts/Layout.astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import GraphContainer from "@components/GraphContainer.astro";
 ---
 
-<Layout title="Welcome to Astro.">
+<BaseLayout title="Welcome to Astro.">
   <main>
     <h1>
       Welcome to <span class="text-gradient">Auto-Spammer</span>
     </h1>
+    <GraphContainer client:load>
+      <p>OLA</p>
+    </GraphContainer>
   </main>
-</Layout>
+</BaseLayout>
 
 <style>
   main {
@@ -36,7 +40,7 @@ import Layout from "../layouts/Layout.astro";
   }
 </style>
 
-<script>
+<!-- <script>
   import {
     register,
     registerAll,
@@ -45,61 +49,12 @@ import Layout from "../layouts/Layout.astro";
   } from "@tauri-apps/plugin-global-shortcut";
   import { invoke } from "@tauri-apps/api/core";
 
-  function countOccurences(str: string, char: string): number {
-    return str.split(char).length - 1;
-  }
-
-  let str = "Hello from Astro";
-  let count_to_ignore = 0;
-
-  // await register("o", async () => {
-  //   if (count_to_ignore === 0) {
-  //     await invoke("type_string", {
-  //       string: str,
-  //     });
-  //     count_to_ignore = countOccurences(str, "o");
-  //   } else {
-  //     count_to_ignore--;
-  //   }
-  // });
-
-  // async function handleOKey() {
-  //   if (count_to_ignore > 0) {
-  //     count_to_ignore--;
-  //   } else {
-  //     count_to_ignore = countOccurences(str, "o");
-  //     await unregister("o");
-  //     await new Promise((resolve) => setTimeout(resolve, 100));
-  //     await invoke("type_string", {
-  //       string: str,
-  //     });
-  //     await register("o", handleOKey);
-  //   }
-  // }
-
-  // await register("o", handleOKey);
-
-  let isRegistering = false;
-
-  async function handleOKey() {
-    if (isRegistering) {
-      return;
-    }
-
-    if (count_to_ignore > 0) {
-      count_to_ignore--;
-    } else {
-      count_to_ignore = countOccurences(str, "o");
-      isRegistering = true;
-      await unregister("o");
-      await new Promise((resolve) => setTimeout(resolve, 100));
-      await invoke("type_string", {
-        string: str,
-      });
-      await register("o", handleOKey);
-      isRegistering = false;
-    }
-  }
-
-  await register("o", handleOKey);
-</script>
+  await register("o", () => {
+    console.log("Fired");
+    invoke("type_string", {
+      string: "switch",
+    }).then(() => {
+      console.log("Typed");
+    });
+  });
+</script> -->
