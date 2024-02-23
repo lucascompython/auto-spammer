@@ -5,11 +5,10 @@ import GraphContainer from "@components/GraphContainer.astro";
 
 <BaseLayout title="Welcome to Astro.">
   <main>
-    <h1>
-      Welcome to <span class="text-gradient">Auto-Spammer</span>
-    </h1>
-    <GraphContainer client:load>
+    <GraphContainer>
       <p>OLA</p>
+      <textarea id="text" rows="10" cols="50" placeholder="Type your text here"
+      ></textarea>
     </GraphContainer>
   </main>
 </BaseLayout>
@@ -57,4 +56,15 @@ import GraphContainer from "@components/GraphContainer.astro";
       console.log("Typed");
     });
   });
+
 </script> -->
+<script>
+  import { invoke } from "@tauri-apps/api/core";
+  import { register } from "@tauri-apps/plugin-global-shortcut";
+
+  await register("F6", async () => {
+    await invoke("type_string", {
+      string: "O lucas é lindo",
+    });
+  });
+</script>

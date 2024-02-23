@@ -6,6 +6,7 @@ import sys
 import subprocess
 from time import perf_counter
 from shutil import rmtree
+from typing import Sequence
 
 OS = sys.platform
 if OS == "win32":
@@ -66,7 +67,7 @@ def verbose_print(message) -> None:
         print(message)
 
 
-def run_command(command: tuple[str], **kwargs) -> None:  
+def run_command(command: Sequence, **kwargs) -> None:  
     try:
         if VERBOSE:
             subprocess.run(command, check=True, **kwargs)

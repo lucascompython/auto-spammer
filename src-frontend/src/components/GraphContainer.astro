@@ -4,63 +4,80 @@
 // And will be able to be dragged and dropped on top of this container
 ---
 
-<div class="graph-container" onwheel="handleWheel()">
-  <slot />
-</div>
+<svg
+  class="graph-container"
+  id="graph-container"
+  xmlns="http://www.w3.org/2000/svg"
+  width="100%"
+  height="100%"
+>
+  <defs>
+    <pattern
+      id="smallGrid"
+      width="10"
+      height="10"
+      patternUnits="userSpaceOnUse"
+    >
+      <path d="M 10 0 L 0 0 0 10" fill="none" stroke="gray" stroke-width="0.5"
+      ></path>
+    </pattern>
+    <pattern id="grid" width="100" height="100" patternUnits="userSpaceOnUse">
+      <rect width="100" height="100" fill="url(#smallGrid)"></rect>
+      <path d="M 100 0 L 0 0 0 100" fill="none" stroke="gray" stroke-width="1"
+      ></path>
+    </pattern>
+  </defs>
+
+  <rect width="100%" height="100%" fill="url(#grid)"></rect>
+  <g id="content">
+    <slot />
+  </g>
+</svg>
 
 <style>
-  /* Make graph container occypy the screen below the title */
-
   .graph-container {
-    /* Make graph container occupy the screen below the title */
     position: absolute;
     top: 0;
     right: 0;
     bottom: 0;
     left: 0;
     overflow: auto;
-    background-color: #282c34; /* Dark background color */
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Crect width='20' height='20' fill='%23282c34'/%3E%3Cpath d='M20 0v1H0V0h20zm0 5v1H0V5h20zm0 5v1H0v-1h20zm0 5v1H0v-1h20zM0 0h1v20H0V0zm5 0h1v20H-1V0zm5 0h1v20h-1V0zm5 0h1v20h-1V0z' fill='%23333'/%3E%3C/svg%3E"); /* Slightly lighter grid color */
-    background-size: 20px 20px;
   }
 </style>
 
 <script>
-  let isDragging = false;
-  let startX: number, startY: number;
-  let scale = 1;
+  document.addEventListener("DOMContentLoaded", function () {
+    const svg = document.getElementById(
+      "graph-container",
+    ) as SVGSVGElement | null;
+    const pt: SVGPoint = svg!.createSVGPoint();
 
-  function handleWheel(event: WheelEvent) {
-    event.preventDefault();
+    // Initialize the transform attribute
+    svg!.setAttribute("transform", "translate(0, 0) scale(1)");
 
-    // Change scale factor based on wheel delta
-    scale += event.deltaY * -0.01;
+    function cursorPoint(evt: MouseEvent): SVGPoint {
+      pt.x = evt.clientX;
+      pt.y = evt.clientY;
+      return pt.matrixTransform(svg!.getScreenCTM()!.inverse());
+    }
 
-    // Restrict scale
-    scale = Math.min(Math.max(0.125, scale), 4);
+    svg!.addEventListener("wheel", function (evt: WheelEvent) {
+      evt.preventDefault();
 
-    // Apply scale transform
-    // @ts-ignore
-    event.currentTarget!.style.transform = `scale(${scale})`;
-  }
+      const newScale: number = evt.deltaY < 0 ? 1.1 : 0.9;
 
-  function handleMouseDown(event: MouseEvent) {
-    isDragging = true;
-    startX = event.clientX;
-    startY = event.clientY;
-  }
+      const currTrans: string | null = svg!.getAttribute("transform");
+      const currScale: number = currTrans
+        ? parseFloat(currTrans.match(/scale\((.*?)\)/)![1])
+        : 1;
 
-  function handleMouseMove(event: MouseEvent) {
-    if (!isDragging) return;
-    const dx = event.clientX - startX;
-    const dy = event.clientY - startY;
-    // @ts-ignore
-    event.currentTarget!.scrollBy(-dx, -dy);
-    startX = event.clientX;
-    startY = event.clientY;
-  }
+      const x: number = cursorPoint(evt).x;
+      const y: number = cursorPoint(evt).y;
 
-  function handleMouseUp(event: MouseEvent) {
-    isDragging = false;
-  }
+      const newTrans: string = `translate(${x} ${y}) scale(${newScale * currScale}) translate(${-x} ${-y})`;
+      console.log(newTrans);
+
+      svg!.setAttribute("transform", newTrans);
+    });
+  });
 </script>
