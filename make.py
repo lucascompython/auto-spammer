@@ -103,7 +103,7 @@ def clean() -> None:
     
     if VERBOSE:
         end = perf_counter()
-        print(f"{Colors.success_message(f'Cleaned build directories and dependencies in {end - start:.2f} seconds.')}\n")
+        print(f"{Colors.success_message(f'Cleaned build directories and dependencies in {end - start:.2f} seconds.')}\n") # type: ignore
         
 def check_node_modules() -> None:   
     verbose_print(Colors.info_message("Checking for frontend dependencies..."))
@@ -130,7 +130,7 @@ def get_target(target: str) -> str:
         return "x86_64-pc-windows-msvc"
     
     else:
-        sys.stderr.write(f"{Colors.error_message(f"Invalid target: {target}.")}\n")
+        sys.stderr.write(f"{Colors.error_message(f'Invalid target: {target}.')}\n")
         sys.exit(1)
 
 def get_app_name(target: str) -> str:
@@ -231,14 +231,14 @@ def run_app(target: str) -> None:
             app_path
         ]
     else:
-        sys.stderr.write(f"{Colors.error_message(f"Unsupported OS: {OS}.")}\n")
+        sys.stderr.write(f"{Colors.error_message(f'Unsupported OS: {OS}.')}\n")
         sys.exit(1)
     
     print(Colors.info_message(f"Running {app_path}..."))
     proc = subprocess.run(command, capture_output=True)
 
     if proc.returncode != 0:
-        sys.stderr.write(f"{Colors.error_message(f"Error running {app_path}.")}\n")
+        sys.stderr.write(f"{Colors.error_message(f'Error running {app_path}.')}\n")
         sys.exit(1)
     
     if OS == "linux":
