@@ -4,5 +4,5 @@ import svelte from "@astrojs/svelte";
 
 // https://astro.build/config
 export default defineConfig({
-  integrations: [svelte(), (await import("astro-compress")).default()]
+  integrations: [svelte(), (await import("astro-compress")).default()],
 });

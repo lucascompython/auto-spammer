@@ -1,70 +1,28 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
 import GraphContainer from "@components/GraphContainer.svelte";
+import "@xyflow/svelte/dist/style.css";
 ---
 
 <BaseLayout title="Welcome to Astro.">
   <main>
-    <GraphContainer client:load>
-      <p>OLA</p>
-      <textarea id="text" rows="10" cols="50" placeholder="Type your text here"
-      ></textarea>
-    </GraphContainer>
+    <GraphContainer client:load />
   </main>
 </BaseLayout>
 
-<style>
-  main {
-    margin: auto;
-    padding: 1rem;
-    max-width: calc(100% - 2rem);
-    color: white;
-    font-size: 20px;
-    line-height: 1.6;
-  }
-
-  h1 {
-    font-size: 4rem;
-    font-weight: 700;
-    line-height: 1;
-    text-align: center;
-    margin-bottom: 1em;
-  }
-  .text-gradient {
-    background-image: var(--accent-gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-size: 400%;
-    background-position: 0%;
-  }
-</style>
-
-<!-- <script>
-  import {
-    register,
-    registerAll,
-    isRegistered,
-    unregister,
-  } from "@tauri-apps/plugin-global-shortcut";
-  import { invoke } from "@tauri-apps/api/core";
-
-  await register("o", () => {
-    console.log("Fired");
-    invoke("type_string", {
-      string: "switch",
-    }).then(() => {
-      console.log("Typed");
-    });
-  });
-
-</script> -->
 <script>
   import { invoke } from "@tauri-apps/api/core";
   import { register } from "@tauri-apps/plugin-global-shortcut";
 
-  await register("F6", async () => {
+  await register("o", async () => {
     await invoke("type_string", {
-      string: "O lucas é lindo",
+      string: "view monitor",
+    });
+  });
+
+  await register("p", async () => {
+    await invoke("type_string", {
+      string: "switch",
     });
   });
 </script>
