@@ -1,11 +1,11 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
-import GraphContainer from "@components/GraphContainer.astro";
+import GraphContainer from "@components/GraphContainer.svelte";
 ---
 
 <BaseLayout title="Welcome to Astro.">
   <main>
-    <GraphContainer>
+    <GraphContainer client:load>
       <p>OLA</p>
       <textarea id="text" rows="10" cols="50" placeholder="Type your text here"
       ></textarea>
