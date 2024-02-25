@@ -65,6 +65,7 @@
     background: #2c2d2f;
     overflow: hidden;
     width: 100%;
+    color: #ffffff;
   }
 
   .title {
