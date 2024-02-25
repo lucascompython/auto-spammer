@@ -2,13 +2,14 @@
   import { writable } from "svelte/store";
   import {
     SvelteFlow,
-    Controls,
     Background,
     BackgroundVariant,
     MiniMap,
+    type IsValidConnection,
   } from "@xyflow/svelte";
 
   import TypeNode from "./ColorPickerNode.svelte";
+  import BaseNode from "./BaseNode/BaseNode.svelte";
 
   // 👇 this is important! You need to./ColorPicker.sveltes for Svelte Flow to work
   import "@xyflow/svelte/dist/style.css";
@@ -34,6 +35,15 @@
       data: { color: writable("#ff4000") },
       position: { x: 0, y: 300 },
     },
+    {
+      id: "4",
+      type: "baseNode",
+      data: {
+        title: "Base Node",
+        attributes: [writable("Attribute 1"), writable("Attribute 2")],
+      },
+      position: { x: 0, y: 450 },
+    },
   ]);
 
   // same for edges
@@ -49,9 +59,15 @@
 
   const nodeTypes = {
     colorPicker: TypeNode,
+    baseNode: BaseNode,
   };
 
-  const snapGrid = [25, 25] as [number, number];
+  const isValidConnection: IsValidConnection = (connection) => {
+    if (connection.source === "3") {
+      return true;
+    }
+    return false;
+  };
 </script>
 
 <!--
@@ -62,10 +78,11 @@ This means that the parent container needs a height to render the flow.
   <SvelteFlow
     {nodes}
     {edges}
-    {snapGrid}
     {nodeTypes}
     fitView
     proOptions={{ hideAttribution: true }}
+    zoomOnDoubleClick={false}
+    {isValidConnection}
     on:nodeclick={(event) => console.log("on node click", event.detail.node)}
   >
     <Background
