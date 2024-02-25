@@ -274,8 +274,8 @@ def main() -> None:
 
     if args.dev:
         print(Colors.info_message("Building in development mode..."))
-        check_node_modules() 
         VERBOSE = True # Always print output in development mode
+        check_node_modules() 
         run_command(("cargo", "tauri", "dev"), cwd="src-tauri")  
         VERBOSE = args.verbose # Reset verbosity to user's preference
 
