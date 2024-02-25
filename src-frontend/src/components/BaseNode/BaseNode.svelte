@@ -53,7 +53,10 @@
   }
 
   .base-node:hover {
-    border: 2px solid #f25278;
+    border-image: var(--accent-gradient);
+    border-image-slice: 1;
+    border-width: 2px;
+    border-style: solid;
   }
 
   .attributes-area-wrapper {
