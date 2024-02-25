@@ -1,3 +1,3 @@
 # Auto Spammer
 
-A Visual Programming Tool for creating keyboard and mouse macros.
+A Crossplatform Visual Programming/Scripting App for keyboard and mouse macros
