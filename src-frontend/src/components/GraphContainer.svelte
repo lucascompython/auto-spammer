@@ -8,9 +8,9 @@
     MiniMap,
   } from "@xyflow/svelte";
 
-  import TypeNode from "./TypeNode.svelte";
+  import TypeNode from "./ColorPickerNode.svelte";
 
-  // 👇 this is important! You need to import the styles for Svelte Flow to work
+  // 👇 this is important! You need to./ColorPicker.sveltes for Svelte Flow to work
   import "@xyflow/svelte/dist/style.css";
 
   // We are using writables for the nodes and edges to sync them easily. When a user drags a node for example, Svelte Flow updates its position.
@@ -65,12 +65,14 @@ This means that the parent container needs a height to render the flow.
     {snapGrid}
     {nodeTypes}
     fitView
+    proOptions={{ hideAttribution: true }}
     on:nodeclick={(event) => console.log("on node click", event.detail.node)}
   >
     <Background
       variant={BackgroundVariant.Lines}
       bgColor="#242424"
-      patternColor="#f25278"
+      patternColor="#484848"
+      gap={25}
     />
     <MiniMap />
   </SvelteFlow>

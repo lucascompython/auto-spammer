@@ -14,15 +14,15 @@ import "@xyflow/svelte/dist/style.css";
   import { invoke } from "@tauri-apps/api/core";
   import { register } from "@tauri-apps/plugin-global-shortcut";
 
-  await register("o", async () => {
-    await invoke("type_string", {
-      string: "view monitor",
-    });
-  });
+  // await register("o", async () => {
+  //   await invoke("type_string", {
+  //     string: "view monitor",
+  //   });
+  // });
 
-  await register("p", async () => {
-    await invoke("type_string", {
-      string: "switch",
-    });
-  });
+  // await register("p", async () => {
+  //   await invoke("type_string", {
+  //     string: "switch",
+  //   });
+  // });
 </script>
