@@ -14,9 +14,9 @@
       {
         "fullscreen": false,
         "resizable": true,
-        "title": "auto-spammer",
-        "width": 800,
-        "height": 600
+        "title": "Auto Spammer",
+        "width": 1200,
+        "height": 1024
       }
     ],
     "security": {
