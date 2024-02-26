@@ -51,14 +51,12 @@
     font-size: 0.7rem;
     border: 2.5px solid #eee;
     border-radius: 0.5rem;
+    transition: border-color 0.3s ease;
   }
 
   .base-node:hover {
-    border-image: var(--accent-gradient);
-    border-image-slice: 1;
-    border-width: 2px;
-    border-style: solid;
-    border-radius: 0.5rem;
+    border-color: var(--accent);
+    transition: border-color 0.3s ease;
   } */
 
   /* TODO: See the why this is blurrying things on certai environments */
