@@ -10,7 +10,7 @@
 
   const { title, attributes } = data;
 
-  const attributeValues = attributes.map((attr) => get(attr));
+  const attributeValues = data.attributes.map((attr) => get(attr));
   const attributesString = attributeValues.join("\n");
   console.log(attributesString);
 </script>
@@ -44,12 +44,13 @@
 </div>
 
 <style>
-  .base-node {
+  /* .base-node {
     padding: 1rem;
     background: #3d3d3d;
     border-radius: 0.125rem;
     font-size: 0.7rem;
     border: 2.5px solid #eee;
+    border-radius: 0.5rem;
   }
 
   .base-node:hover {
@@ -57,6 +58,34 @@
     border-image-slice: 1;
     border-width: 2px;
     border-style: solid;
+    border-radius: 0.5rem;
+  } */
+
+  /* TODO: See the why this is blurrying things on certai environments */
+  .base-node {
+    position: relative;
+    padding: 1rem;
+    background: #3d3d3d;
+    border-radius: 0.5rem;
+    font-size: 0.7rem;
+  }
+
+  .base-node:before {
+    content: "";
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    bottom: -2px;
+    left: -2px;
+    background: var(--accent-gradient);
+    border-radius: 0.5rem;
+    z-index: -1;
+    transition: opacity 0.3s ease;
+    opacity: 0;
+  }
+
+  .base-node:hover:before {
+    opacity: 1;
   }
 
   .attributes-area-wrapper {
