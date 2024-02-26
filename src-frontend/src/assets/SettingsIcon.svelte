@@ -24,4 +24,8 @@
     stroke: var(--accent);
     transition: stroke 0.3s;
   }
+
+  .settings-icon path {
+    transition: stroke 0.3s;
+  }
 </style>
