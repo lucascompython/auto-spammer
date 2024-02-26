@@ -25,7 +25,14 @@
 
       <!-- <img class="settings-icon" src="/settings.svg" alt="Settings Icon" /> -->
       <div class="settings-icon">
-        <SettingsIcon />
+        <button
+          on:click={(e) => {
+            console.log("ola");
+            console.log("ola2");
+          }}
+        >
+          <SettingsIcon />
+        </button>
       </div>
     </div>
 
@@ -115,7 +122,12 @@
     margin-left: 5rem;
   }
 
-  .settings-icon:hover {
+  .settings-icon:hover button {
     cursor: pointer;
+  }
+
+  .settings-icon button {
+    background: none;
+    border: none;
   }
 </style>
