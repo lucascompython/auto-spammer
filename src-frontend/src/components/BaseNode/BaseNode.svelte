@@ -8,46 +8,38 @@
 
   export let data: { title: string; attributes: Writable<string>[] };
 
-  const { title, attributes } = data;
-
   const attributeValues = data.attributes.map((attr) => get(attr));
   const attributesString = attributeValues.join("\n");
-  console.log(attributesString);
 </script>
 
 <div class="base-node">
   <Handle type="target" position={Position.Left} />
-
   <Handle type="source" position={Position.Right} />
-  <div>
-    <div class="top-part">
-      <p class="title">{data.title}</p>
 
-      <!-- <img class="settings-icon" src="/settings.svg" alt="Settings Icon" /> -->
-      <div class="settings-icon">
-        <button
-          on:click={(e) => {
-            console.log("ola");
-            console.log("ola2");
-          }}
-        >
-          <SettingsIcon />
-        </button>
-      </div>
-    </div>
+  <div class="top-part">
+    <p class="title">{data.title}</p>
 
-    <div class="attributes-area-wrapper">
-      <textarea
-        class="attributes-area"
-        disabled
-        style="margin-top: 0.5rem"
-        rows="2"
-        cols="20"
+    <div class="settings-icon">
+      <button
+        on:click={(e) => {
+          console.log("ola");
+          console.log("ola2");
+        }}
       >
-        {attributesString}
-      </textarea>
+        <SettingsIcon />
+      </button>
     </div>
   </div>
+
+  <textarea
+    class="attributes-area"
+    disabled
+    style="margin-top: 0.5rem"
+    rows="2"
+    cols="20"
+  >
+    {attributesString}
+  </textarea>
 </div>
 
 <style>
@@ -93,16 +85,14 @@
     opacity: 1;
   }
 
-  .attributes-area-wrapper {
-    width: 97.3%;
-  }
-
   .attributes-area {
     resize: none;
     background: #2c2d2f;
     overflow: hidden;
-    width: 100%;
+    width: 97.3%;
     color: #ffffff;
+    border: none;
+    white-space: pre-line;
   }
 
   .title {
