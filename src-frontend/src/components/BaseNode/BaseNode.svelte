@@ -1,9 +1,29 @@
 <script lang="ts">
-  import { Handle, Position, type NodeProps } from "@xyflow/svelte";
+  import {
+    Handle,
+    Position,
+    type NodeProps,
+    useConnection,
+  } from "@xyflow/svelte";
   import SettingsIcon from "@assets/SettingsIcon.svelte";
 
   type $$Props = NodeProps;
   export let data: $$Props["data"];
+
+  export let id: $$Props["id"];
+
+  const connection = useConnection();
+
+  let isConnecting = false;
+  let isTarget = false;
+
+  $: isConnecting = !!$connection.startHandle?.nodeId;
+  $: isTarget =
+    !!$connection.startHandle &&
+    $connection.startHandle?.nodeId !== id &&
+    $connection.startHandle?.type === "source";
+
+  console.log(connection);
 </script>
 
 <div class="wrapper gradient">
@@ -31,7 +51,11 @@
       <slot />
     </div>
   </div>
-  <Handle type="target" position={Position.Left} />
+  <Handle
+    style="background-color: {isTarget ? '#55dd99' : ''}"
+    type="target"
+    position={Position.Left}
+  />
   <Handle type="source" position={Position.Right} />
 </div>
 
