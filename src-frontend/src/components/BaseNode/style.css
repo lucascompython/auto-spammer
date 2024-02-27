@@ -42,6 +42,7 @@
   border-radius: 100%;
 }
 
+.svelte-flow__node-turbo.selected .wrapper.gradient:before,
 .svelte-flow__node-turbo:hover .wrapper.gradient:before {
   content: "";
   background: conic-gradient(
