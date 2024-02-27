@@ -20,12 +20,10 @@
 </svg>
 
 <style>
-  .settings-icon:hover path {
-    stroke: var(--accent);
-    transition: stroke 0.3s;
-  }
-
   .settings-icon path {
     transition: stroke 0.3s;
+  }
+  .settings-icon:hover path {
+    stroke: #e92a67;
   }
 </style>
