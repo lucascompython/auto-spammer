@@ -12,7 +12,7 @@
     type EdgeTypes,
   } from "@xyflow/svelte";
 
-  import TypeNode from "./ColorPickerNode.svelte";
+  // import TypeNode from "./TypeNode/TypeNode.svelte";
   import BaseNode from "./BaseNode/BaseNode.svelte";
   import Edge from "./BaseNode/Edge.svelte";
   import { initialNodes, initialEdges } from "./nodes-and-edges";
@@ -27,6 +27,7 @@
     // colorPicker: TypeNode,
     // baseNode: BaseNode,
     turbo: BaseNode,
+    // typeNode: TypeNode,
   };
 
   const edgeTypes: EdgeTypes = {
