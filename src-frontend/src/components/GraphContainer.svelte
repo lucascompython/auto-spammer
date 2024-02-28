@@ -57,6 +57,7 @@
     proOptions={{ hideAttribution: true }}
     zoomOnDoubleClick={false}
     {isValidConnection}
+    colorMode="dark"
     on:nodeclick={(event) => console.log("on node click", event.detail.node)}
   >
     <Controls />
