@@ -89,9 +89,7 @@
   width: 0.75rem;
   height: 0.75rem;
   position: fixed;
-
-  transform-origin: center center;
-  overflow: hidden;
+  border-width: 2px;
   box-shadow: var(--node-box-shadow);
 }
 
@@ -133,5 +131,19 @@
 }
 
 .svelte-flow__handle.valid {
-  background: #55dd99;
+  background: #27d209;
+}
+
+.svelte-flow__handle {
+  transition: 0.2s;
+}
+
+.svelte-flow__handle.target:hover {
+  border-color: #e92a67;
+  box-shadow: 0 0 10px #e92a67;
+}
+
+.svelte-flow__handle.source:hover {
+  border-color: #2a8af6;
+  box-shadow: 0 0 10px #2a8af6;
 }

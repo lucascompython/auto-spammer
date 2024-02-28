@@ -39,10 +39,10 @@
   };
 
   const isValidConnection: IsValidConnection = (connection) => {
-    if (connection.source === "3") {
-      return true;
+    if (connection.source === connection.target) {
+      return false;
     }
-    return false;
+    return true;
   };
 </script>
 
@@ -53,10 +53,10 @@
     {nodeTypes}
     {edgeTypes}
     {defaultEdgeOptions}
+    {isValidConnection}
     fitView
     proOptions={{ hideAttribution: true }}
     zoomOnDoubleClick={false}
-    {isValidConnection}
     colorMode="dark"
     on:nodeclick={(event) => console.log("on node click", event.detail.node)}
   >

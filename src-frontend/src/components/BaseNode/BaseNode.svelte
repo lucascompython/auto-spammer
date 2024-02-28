@@ -52,11 +52,15 @@
     </div>
   </div>
   <Handle
-    style="background-color: {isTarget ? '#55dd99' : ''}"
+    style="border-color: {isTarget ? '#e92a67' : ''}"
     type="target"
     position={Position.Left}
   />
-  <Handle type="source" position={Position.Right} />
+  <Handle
+    style="border-color: {isConnecting && !isTarget ? '#2a8af6' : ''}"
+    type="source"
+    position={Position.Right}
+  />
 </div>
 
 <style>
