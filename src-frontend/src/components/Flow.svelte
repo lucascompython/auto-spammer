@@ -10,9 +10,10 @@
     type IsValidConnection,
     Controls,
     type EdgeTypes,
+    type NodeTypes,
   } from "@xyflow/svelte";
 
-  // import TypeNode from "./TypeNode/TypeNode.svelte";
+  import TypeNode from "./TypeNode/TypeNode.svelte";
   import BaseNode from "./BaseNode/BaseNode.svelte";
   import Edge from "./BaseNode/Edge.svelte";
   import { initialNodes, initialEdges } from "./nodes-and-edges";
@@ -23,11 +24,11 @@
   const nodes = writable<NodeType[]>(initialNodes);
   const edges = writable<EdgeType[]>(initialEdges);
 
-  const nodeTypes = {
+  const nodeTypes: NodeTypes = {
     // colorPicker: TypeNode,
     // baseNode: BaseNode,
     turbo: BaseNode,
-    // typeNode: TypeNode,
+    typeNode: TypeNode,
   };
 
   const edgeTypes: EdgeTypes = {

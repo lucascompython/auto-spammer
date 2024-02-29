@@ -37,6 +37,18 @@ export const initialNodes: Node[] = [
     data: { title: "Scroll Mouse" },
     type: "turbo",
   },
+  {
+    id: "7",
+    position: { x: 1500, y: 250 },
+    data: {
+      title: "Type Text",
+      text: "ola",
+      subline: "Types a given text",
+      cancelKey: "P",
+      delay: 0.6,
+    },
+    type: "typeNode",
+  },
 ];
 
 export const initialEdges: Edge[] = [
