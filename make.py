@@ -107,9 +107,7 @@ def clean() -> None:
         
 def check_node_modules() -> None:   
     verbose_print(Colors.info_message("Checking for frontend dependencies..."))
-    if not os.path.exists("src-frontend/node_modules"):
-        print(Colors.info_message("Installing frontend dependencies..."))
-        run_command(("bun", "install"), cwd="src-frontend")
+    run_command(("bun", "install"), cwd="src-frontend")
     
 
 def get_target(target: str) -> str:
