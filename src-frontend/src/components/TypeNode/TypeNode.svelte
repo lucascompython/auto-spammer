@@ -55,21 +55,18 @@
   {positionAbsoluteX}
   {positionAbsoluteY}
 >
-  <label>
+  <!-- <label>
     Text:
-    <input
-      type="text"
-      bind:value={data.text}
-      style="width: {data.text.length * 7}px"
-    />
-  </label>
+    <input type="text" bind:value={data.text} />
+  </label> -->
+
+  <span role="textbox" contenteditable="true">Test</span>
 
   <label>
     Delay:
     <input
       type="number"
       bind:value={data.delay}
-      style="width: {data.delay.toString().length * 7}px"
       on:keyup={(e) => {
         // TODO: Fix this
         if (
