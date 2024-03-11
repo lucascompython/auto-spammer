@@ -12,6 +12,7 @@ Optional
 + Install nightly rust toolchain for binary size optimizations
 + Install upx for compression
 + On linux for reading the memory usage install the GNU time command
++ Install the mold linker if you wish to use it
 
 ```bash
 git clone https://github.com/lucascompython/auto-spammer

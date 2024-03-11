@@ -39,7 +39,7 @@ class Colors:
 
     @classmethod
     def success_message(cls, message: str) -> str:
-        return f"{cls.GREEN}{cls.BOLD}SUCESS:{cls.END} {message}"
+        return f"{cls.GREEN}{cls.BOLD}SUCCESS:{cls.END} {message}"
 
     @classmethod
     def info_message(cls, message: str) -> str:
@@ -96,7 +96,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--native",
         action="store_true",
-        help=f"Build using the {Colors.ITALIC}'target-cpu=native'{Colors.END} flag. This will optimize the binary for the current CPU architecture.",
+        help=f"Build using the {Colors.ITALIC}'target-cpu=native'{Colors.END} flag. This will optimize the binary for the current CPU architecture. {Colors.YELLOW}Not recommended for cross-compilation{Colors.END}.",
+    )
+    parser.add_argument(
+        "-m",
+        "--mold",
+        action="store_true",
+        help=f"Use the {Colors.ITALIC}mold{Colors.END} linker. {Colors.UNDERLINE}Only works on Linux.{Colors.END}",
     )
     parser.add_argument(
         "-s",
@@ -203,6 +209,16 @@ def build_release(args: argparse.Namespace) -> float | None:
     command = ["cargo", "tauri", "build", "--target", target]
     rustflags = []
 
+    if args.mold:
+        if OS != "linux":
+            print(
+                Colors.warning_message(
+                    "The mold linker only works on Linux. Ignoring --mold flag."
+                )
+            )
+        else:
+            rustflags.append("-C link-arg=-fuse-ld=mold")
+
     if "msvc" in target:
         rustflags.append(
             "-C target-feature=+crt-static"
@@ -286,7 +302,7 @@ def run_app(target: str) -> None:
     app_path = f"./src-tauri/target/{get_target(target)}/release/{get_app_name(target)}"
 
     if OS == "linux":
-        command = ["/usr/bin/time", "-f", "'%M'", app_path]
+        command = ["/usr/bin/time", "-f", "%M", app_path]
     elif OS == "windows":
         command = [
             "powershell",
@@ -300,7 +316,7 @@ def run_app(target: str) -> None:
         sys.stderr.write(f"{Colors.error_message(f'Unsupported OS: {OS}.')}\n")
         sys.exit(1)
 
-    print(Colors.info_message(f"Running {app_path}..."))
+    print(Colors.info_message(f"Running {Colors.UNDERLINE + app_path + Colors.END}..."))
     proc = subprocess.run(command, capture_output=True)
 
     if proc.returncode != 0:
@@ -308,9 +324,9 @@ def run_app(target: str) -> None:
         sys.exit(1)
 
     if OS == "linux":
-        peak_mem = proc.stderr.decode().strip().replace("'", "").split("\n")[-1]
+        peak_mem = proc.stderr.decode().strip().split("\n")[-1]
     else:
-        peak_mem = proc.stdout.decode().strip()
+        peak_mem = proc.stdout.decode().strip().split("\n")[-1]
 
     peak_mem = convert_bytes(peak_mem + "000" if OS == "linux" else peak_mem)
 
