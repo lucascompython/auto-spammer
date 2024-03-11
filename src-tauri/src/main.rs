@@ -39,54 +39,20 @@ fn type_char(ch: char) {
 #[no_mangle]
 fn main() {
     tauri::Builder::default()
-        // .plugin(tauri_plugin_global_shortcut::init())
         .setup(|app| {
-            // #[cfg(desktop)]
-            // app.handle()
-            //     .plugin(tauri_plugin_global_shortcut::Builder::new().build())?;
-            // Ok(())
             app.manage(EnigoState(Mutex::new(enigo::Enigo::new(
                 &enigo::Settings::default(),
             )?)));
 
             #[cfg(desktop)]
-            app.handle().plugin(
-                tauri_plugin_global_shortcut::Builder::with_handler(move |app, shortcut| {
-                    // let enigo = app.state::<EnigoState>();
-                    // let mut enigo = enigo.0.lock().unwrap();
+            app.handle()
+                .plugin(tauri_plugin_global_shortcut::Builder::new().build())?;
 
-                    // if shortcut.matches(Modifiers::SHIFT, Code::KeyP) {
-                    //     println!("MATCHES");
-                    //     enigo.text("switch").unwrap();
-                    // }
-
-                    // if shortcut.matches(Modifiers::empty(), Code::KeyO) {
-                    //     enigo.text("view monitor").unwrap();
-                    //     std::thread::sleep(std::time::Duration::from_millis(2000));
-                    //     //press enter
-                    //     enigo
-                    //         .key(enigo::Key::Return, enigo::Direction::Click)
-                    //         .unwrap();
-                    // } else if shortcut.matches(Modifiers::empty(), Code::KeyP) {
-                    //     enigo.text("switch").unwrap();
-                    //     // sleep for 1 second
-                    //     std::thread::sleep(std::time::Duration::from_millis(2000));
-                    //     //press enter
-                    //     enigo
-                    //         .key(enigo::Key::Return, enigo::Direction::Click)
-                    //         .unwrap();
-                    // }
-                })
-                .build(),
-            )?;
-
-            #[cfg(debug_assertions)] // only include this code on debug builds
+            #[cfg(debug_assertions)]
             {
                 let window = app.get_webview_window("main").unwrap();
                 window.open_devtools();
             };
-            // app.global_shortcut().register("o")?;
-            // app.global_shortcut().register("Shift+P")?;
 
             Ok(())
         })
@@ -94,11 +60,3 @@ fn main() {
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
-
-// fn main() {
-//     tauri::Builder::default()
-//         // .plugin(tauri_plugin_shell::init())
-//         .invoke_handler(tauri::generate_handler![greet])
-//         .run(tauri::generate_context!())
-//         .expect("error while running tauri application");
-// }
