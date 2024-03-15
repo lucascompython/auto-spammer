@@ -126,7 +126,8 @@
 .svelte-flow__controls button path {
   fill: var(--text-color);
 }
-.svelte-flow__handle.connecting {
+.svelte-flow__handle.connectingto {
+  /* https://github.com/xyflow/xyflow/issues/3999 */
   background: #ff6060;
 }
 
