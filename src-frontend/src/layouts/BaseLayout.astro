@@ -10,7 +10,10 @@ const { title } = Astro.props;
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="description" content="Astro description" />
+    <meta
+      name="description"
+      content="An app to create keyboard and mouse macros"
+    />
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
@@ -30,9 +33,13 @@ const { title } = Astro.props;
       var(--accent) 100%
     );
   }
+  body {
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* IE 10+ */
+    user-select: none; /* General */
+  }
   html {
     font-family: system-ui, sans-serif;
-    background: #13151a;
-    background-size: 224px;
   }
 </style>
