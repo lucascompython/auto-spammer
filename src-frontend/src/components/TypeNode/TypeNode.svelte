@@ -1,12 +1,16 @@
 <script lang="ts">
-  import { type NodeProps } from "@xyflow/svelte";
-  import BaseNode from "@components/BaseNode/BaseNode.svelte";
+  import BaseNode, {
+    type BaseNodeProps,
+  } from "@components/BaseNode/BaseNode.svelte";
 
-  type $$Props = NodeProps;
+  type $$Props = BaseNodeProps & {
+    data: {
+      text: string;
+      delay: number;
+    };
+  };
   export let id: $$Props["id"];
   id;
-  // export let data: $$Props["data"];
-  // data;
   export let dragHandle: $$Props["dragHandle"] = undefined;
   dragHandle;
   export let type: $$Props["type"] = undefined;
@@ -32,21 +36,20 @@
   export let positionAbsoluteY: $$Props["positionAbsoluteY"];
   positionAbsoluteY;
 
-  export let data: $$Props["data"] = {
+  export const data: $$Props["data"] = {
     text: "Type something",
-    delay: 0,
+    delay: 69,
+    title: "Type Node",
+    subline: "Subline",
   };
-
-  // export let data: {
-  //   text: string;
-  //   delay: number;
-  //   cancelKey?: string;
-  // };
 </script>
 
 <BaseNode
   {id}
-  {data}
+  data={{
+    title: data.title,
+    subline: data.subline,
+  }}
   {dragHandle}
   {type}
   {selected}
@@ -60,88 +63,76 @@
   {positionAbsoluteX}
   {positionAbsoluteY}
 >
-  <!-- <label>
-    Text:
-    <input type="text" bind:value={data.text} />
-  </label> -->
+  <div class="input-container">
+    <div class="label">Text:</div>
+    <span class="nodrag" contenteditable="true" bind:innerText={data.text}
+    ></span>
+  </div>
 
-  <span role="textbox" contenteditable>Test</span>
-  <span class="input" role="textbox" contenteditable> 99 </span>
-
-  <label>
-    Delay:
-    <input
-      type="number"
-      bind:value={data.delay}
-      on:keyup={(e) => {
-        // TODO: Fix this
-        if (
-          (e.key < "0" || e.key > "9") &&
-          e.key !== "Backspace" &&
-          e.key !== "Delete" &&
-          e.key !== "."
-        ) {
+  <div class="input-container">
+    <div class="label">Delay(s):</div>
+    <span
+      class="nodrag"
+      contenteditable="true"
+      role="textbox"
+      tabindex="0"
+      on:keypress={(e) => {
+        if (e.key === ".") {
+          // @ts-ignore
+          if (e.target.innerText.includes(".")) {
+            e.preventDefault();
+            return false;
+          }
+          return true;
+        } else if (isNaN(parseFloat(e.key))) {
           e.preventDefault();
+          return false;
         }
+
+        return true;
       }}
-    />
-  </label>
+      on:input={(e) => {
+        // @ts-ignore
+        data.delay = parseFloat(e.target.innerText);
+        console.log(data.delay);
+      }}>{data.delay}</span
+    >
+  </div>
 </BaseNode>
 
 <style>
-  input {
+  .input-container {
+    display: flex;
+    align-items: center;
+    margin-left: 0.5rem;
+  }
+
+  .input-container span {
     background: none;
     outline: none;
     border: none;
     color: white;
+    cursor: text;
 
     border-radius: 0.25rem;
     background: #4c4d4f;
-    min-width: 3rem;
+    min-width: 5rem;
     max-width: 160px;
     margin-left: 1rem;
+    margin-top: 0.25rem;
 
     border: 1px solid transparent;
     transition: border 0.2s ease;
+
+    font-size: 0.9rem;
+    font-weight: 400;
 
     &:focus {
       border: 1px solid #e92a67;
     }
   }
 
-  input::-webkit-outer-spin-button,
-  input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
-  input[type="number"] {
-    -moz-appearance: textfield;
-    appearance: textfield;
-  }
-
-  label {
-    display: flex;
-    align-items: center;
-    color: url(--accent-gradient);
-    margin-left: 0.5rem;
-  }
-
-  span {
-    /* make it editable */
-    cursor: text !important;
-    display: inline-block !important;
-    padding: 0.5rem !important;
-    border-radius: 0.25rem !important;
-    background: #4c4d4f !important;
-    color: white !important;
-    margin: 0.5rem !important;
-    -webkit-nbsp-mode: normal !important;
-    white-space: pre-wrap !important;
-    writing-mode: horizontal-tb !important;
-    -webkit-user-select: text !important;
-    user-select: text !important;
-
-    display: inline-block;
-    -webkit-rtl-ordering: logical;
+  .input-container span[tabindex="0"] {
+    max-width: 120px;
   }
 </style>

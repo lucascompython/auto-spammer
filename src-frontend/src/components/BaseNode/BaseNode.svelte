@@ -1,3 +1,12 @@
+<script context="module" lang="ts">
+  export type BaseNodeProps = NodeProps & {
+    data: {
+      title: string;
+      subline?: string;
+    };
+  };
+</script>
+
 <script lang="ts">
   import {
     Handle,
@@ -7,11 +16,32 @@
   } from "@xyflow/svelte";
   import SettingsIcon from "@assets/SettingsIcon.svelte";
 
-  type $$Props = NodeProps;
-  export let data: $$Props["data"];
-
-  export let id: $$Props["id"];
-
+  export let data: BaseNodeProps["data"];
+  export let id: BaseNodeProps["id"];
+  export let dragHandle: BaseNodeProps["dragHandle"] = undefined;
+  dragHandle;
+  export let type: BaseNodeProps["type"] = undefined;
+  type;
+  export let selected: BaseNodeProps["selected"] = undefined;
+  selected;
+  export let isConnectable: BaseNodeProps["isConnectable"];
+  isConnectable;
+  export let zIndex: BaseNodeProps["zIndex"];
+  zIndex;
+  export let width: BaseNodeProps["width"] = undefined;
+  width;
+  export let height: BaseNodeProps["height"] = undefined;
+  height;
+  export let dragging: BaseNodeProps["dragging"];
+  dragging;
+  export let targetPosition: BaseNodeProps["targetPosition"] = undefined;
+  targetPosition;
+  export let sourcePosition: BaseNodeProps["sourcePosition"] = undefined;
+  sourcePosition;
+  export let positionAbsoluteX: BaseNodeProps["positionAbsoluteX"];
+  positionAbsoluteX;
+  export let positionAbsoluteY: BaseNodeProps["positionAbsoluteY"];
+  positionAbsoluteY;
   const connection = useConnection();
 
   let isConnecting = false;
@@ -22,8 +52,6 @@
     !!$connection.startHandle &&
     $connection.startHandle?.nodeId !== id &&
     $connection.startHandle?.type === "source";
-
-  console.log(connection);
 </script>
 
 <div class="wrapper gradient">
@@ -81,7 +109,7 @@
   .subline {
     font-size: 12px;
     color: #777;
-
+    margin-top: 0.35rem;
     margin-bottom: 0.5rem;
   }
 
