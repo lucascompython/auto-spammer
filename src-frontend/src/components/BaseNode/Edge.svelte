@@ -14,6 +14,8 @@
 
   let edgePath: string | undefined;
 
+  // #region Unused props that are here just for not having the "unknown prop" warning
+
   export let source: $$Props["source"];
   source;
   export let target: $$Props["target"];
@@ -40,6 +42,8 @@
   targetHandleId;
   export let markerStart: $$Props["markerStart"] = undefined;
   markerStart;
+
+  // #endregion
 
   $: {
     const xEqual = sourceX === targetX;

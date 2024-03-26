@@ -18,6 +18,9 @@
 
   export let data: BaseNodeProps["data"];
   export let id: BaseNodeProps["id"];
+
+  // #region Unused props that are here just for not having the "unknown prop" warning
+
   export let dragHandle: BaseNodeProps["dragHandle"] = undefined;
   dragHandle;
   export let type: BaseNodeProps["type"] = undefined;
@@ -42,6 +45,9 @@
   positionAbsoluteX;
   export let positionAbsoluteY: BaseNodeProps["positionAbsoluteY"];
   positionAbsoluteY;
+
+  // #endregion
+
   const connection = useConnection();
 
   let isConnecting = false;

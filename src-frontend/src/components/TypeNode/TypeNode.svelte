@@ -9,6 +9,9 @@
       delay: number;
     };
   };
+
+  // #region Unused props that are here just for not having the "unknown prop" warning
+
   export let id: $$Props["id"];
   id;
   export let dragHandle: $$Props["dragHandle"] = undefined;
@@ -35,6 +38,8 @@
   positionAbsoluteX;
   export let positionAbsoluteY: $$Props["positionAbsoluteY"];
   positionAbsoluteY;
+
+  // #endregion
 
   export let data: $$Props["data"] = {
     text: "Type something",
