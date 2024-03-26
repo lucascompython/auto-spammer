@@ -1,9 +1,5 @@
 <script lang="ts">
-  import {
-    type EdgeProps,
-    getBezierPath,
-    type EdgeMarkerType,
-  } from "@xyflow/svelte";
+  import { type EdgeProps, getBezierPath } from "@xyflow/svelte";
 
   type $$Props = EdgeProps;
 
@@ -17,6 +13,33 @@
   export let targetPosition: $$Props["targetPosition"];
 
   let edgePath: string | undefined;
+
+  export let source: $$Props["source"];
+  source;
+  export let target: $$Props["target"];
+  target;
+  export let animated: $$Props["animated"] = undefined;
+  animated;
+  export let selected: $$Props["selected"] = undefined;
+  selected;
+  export let label: $$Props["label"] = undefined;
+  label;
+  export let labelStyle: $$Props["labelStyle"] = undefined;
+  labelStyle;
+  export let data: $$Props["data"] = undefined;
+  data;
+  export let style: $$Props["style"] = undefined;
+  style;
+  export let interactionWidth: $$Props["interactionWidth"] = undefined;
+  interactionWidth;
+  export let type: $$Props["type"];
+  type;
+  export let sourceHandleId: $$Props["sourceHandleId"] = undefined;
+  sourceHandleId;
+  export let targetHandleId: $$Props["targetHandleId"] = undefined;
+  targetHandleId;
+  export let markerStart: $$Props["markerStart"] = undefined;
+  markerStart;
 
   $: {
     const xEqual = sourceX === targetX;
