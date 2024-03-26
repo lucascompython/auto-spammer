@@ -36,7 +36,7 @@
   export let positionAbsoluteY: $$Props["positionAbsoluteY"];
   positionAbsoluteY;
 
-  export const data: $$Props["data"] = {
+  export let data: $$Props["data"] = {
     text: "Type something",
     delay: 69,
     title: "Type Node",
