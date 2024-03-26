@@ -119,7 +119,7 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def verbose_print(message) -> None:
+def verbose_print(message: str) -> None:
     if VERBOSE:
         print(message)
 
@@ -162,7 +162,9 @@ def clean() -> None:
 
     if VERBOSE:
         end = perf_counter()
-        print(f"{Colors.success_message(f'Cleaned build directories and dependencies in {end - start:.2f} seconds.')}\n")  # type: ignore
+        print(
+            f"{Colors.success_message(f'Cleaned build directories and dependencies in {end - start:.2f} seconds.')}\n"
+        )  # type: ignore
 
 
 def check_node_modules() -> None:
