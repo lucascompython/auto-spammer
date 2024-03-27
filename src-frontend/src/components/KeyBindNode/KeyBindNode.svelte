@@ -54,6 +54,7 @@
   data={{
     title: data.title,
     subline: data.subline,
+    enableTarget: false,
   }}
   {dragHandle}
   {type}

@@ -3,6 +3,8 @@
     data: {
       title: string;
       subline?: string;
+      enableTarget?: boolean;
+      enableSource?: boolean;
     };
   };
 </script>
@@ -17,6 +19,14 @@
   import SettingsIcon from "@assets/SettingsIcon.svelte";
 
   export let data: BaseNodeProps["data"];
+
+  if (data.enableTarget === undefined) {
+    data.enableTarget = true;
+  }
+  if (data.enableSource === undefined) {
+    data.enableSource = true;
+  }
+
   export let id: BaseNodeProps["id"];
 
   // #region Unused props that are here just for not having the "unknown prop" warning
@@ -85,16 +95,20 @@
       <slot />
     </div>
   </div>
-  <Handle
-    style="border-color: {isTarget ? '#e92a67' : ''}"
-    type="target"
-    position={Position.Left}
-  />
-  <Handle
-    style="border-color: {isConnecting && !isTarget ? '#2a8af6' : ''}"
-    type="source"
-    position={Position.Right}
-  />
+  {#if data.enableTarget}
+    <Handle
+      style="border-color: {isTarget ? '#e92a67' : ''}"
+      type="target"
+      position={Position.Left}
+    />
+  {/if}
+  {#if data.enableSource}
+    <Handle
+      style="border-color: {isConnecting && !isTarget ? '#2a8af6' : ''}"
+      type="source"
+      position={Position.Right}
+    />
+  {/if}
 </div>
 
 <style>
