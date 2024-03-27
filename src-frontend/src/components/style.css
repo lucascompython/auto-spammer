@@ -29,3 +29,7 @@
     border: 1px solid #e92a67;
   }
 }
+
+.input-container:last-child {
+  margin-bottom: 0.25rem;
+}

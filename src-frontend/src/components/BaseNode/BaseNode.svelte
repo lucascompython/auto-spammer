@@ -122,7 +122,7 @@
   .content {
     background: #2c2d2f;
     width: 100%;
-    min-height: 5rem;
+    min-height: 1.5rem;
     cursor: default;
     border-radius: 0.25rem;
   }
