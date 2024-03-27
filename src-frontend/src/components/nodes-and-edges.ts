@@ -49,6 +49,15 @@ export const initialNodes: Node[] = [
     },
     type: "typeNode",
   },
+  {
+    id: "8",
+    position: { x: 1500, y: 500 },
+    data: {
+      title: "Key Bind",
+      subline: "Define a Key Bind",
+    },
+    type: "keyBindNode",
+  },
 ];
 
 export const initialEdges: Edge[] = [
