@@ -42,9 +42,9 @@ export const initialNodes: Node[] = [
     position: { x: 1500, y: 250 },
     data: {
       title: "Type Text",
-      text: "ola",
+      text: "Hello World!",
       subline: "Types a given text",
-      cancelKey: "P",
+      // cancelKey: "K",
       delay: 0.6,
     },
     type: "typeNode",

@@ -7,6 +7,7 @@
     data: {
       text: string;
       delay: number;
+      cancelKey?: string;
     };
   };
 
@@ -46,6 +47,7 @@
     delay: 69,
     title: "Type Node",
     subline: "Subline",
+    cancelKey: "",
   };
 </script>
 
@@ -99,11 +101,21 @@
       on:input={(e) => {
         // @ts-ignore
         data.delay = parseFloat(e.target.innerText);
-        console.log(data.delay);
       }}>{data.delay}</span
     >
   </div>
-</BaseNode>
+
+  <div class="input-container">
+    <div class="label">Cancel key:</div>
+    <span
+      class="nodrag"
+      class:optional-placeholder={data.cancelKey === ""}
+      contenteditable="true"
+      role="textbox"
+      bind:textContent={data.cancelKey}
+    ></span>
+  </div></BaseNode
+>
 
 <style>
   .input-container {
@@ -139,5 +151,10 @@
 
   .input-container span[tabindex="0"] {
     max-width: 120px;
+  }
+
+  .optional-placeholder::before {
+    content: "Optional";
+    color: rgb(160, 154, 154);
   }
 </style>
