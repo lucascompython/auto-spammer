@@ -27,7 +27,7 @@
   const nodeTypes: NodeTypes = {
     // colorPicker: TypeNode,
     // baseNode: BaseNode,
-    turbo: BaseNode,
+    base: BaseNode,
     typeNode: TypeNode,
   };
 

@@ -104,7 +104,7 @@
     align-items: center;
   }
   .settings-icon {
-    margin-left: 5rem;
+    margin-left: 6rem;
   }
 
   .settings-icon button {
