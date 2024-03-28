@@ -2,13 +2,12 @@
   import BaseNode, {
     type BaseNodeProps,
   } from "@components/BaseNode/BaseNode.svelte";
-  import "../style.css";
+
+  import "./style.css";
 
   type $$Props = BaseNodeProps & {
     data: {
-      text: string;
-      delay: number;
-      cancelKey?: string;
+      keyBind: string;
     };
   };
 
@@ -44,11 +43,9 @@
   // #endregion
 
   export let data: $$Props["data"] = {
-    text: "Type something",
-    delay: 69,
-    title: "Type Node",
+    title: "KeyBind Node",
     subline: "Subline",
-    cancelKey: "",
+    keyBind: "F6",
   };
 </script>
 
@@ -57,6 +54,7 @@
   data={{
     title: data.title,
     subline: data.subline,
+    enableTarget: false,
   }}
   {dragHandle}
   {type}
@@ -72,59 +70,14 @@
   {positionAbsoluteY}
 >
   <div class="input-container">
-    <div class="label">Text:</div>
-    <span class="nodrag" contenteditable="true" bind:innerText={data.text}
+    <div class="label">Key Bind:</div>
+    <span class="nodrag" contenteditable="true" bind:innerText={data.keyBind}
     ></span>
   </div>
-
-  <div class="input-container">
-    <div class="label">Delay(s):</div>
-    <span
-      class="nodrag"
-      contenteditable="true"
-      role="textbox"
-      tabindex="0"
-      on:keypress={(e) => {
-        if (e.key === ".") {
-          // @ts-ignore
-          if (e.target.innerText.includes(".")) {
-            e.preventDefault();
-            return false;
-          }
-          return true;
-        } else if (isNaN(parseFloat(e.key))) {
-          e.preventDefault();
-          return false;
-        }
-
-        return true;
-      }}
-      on:input={(e) => {
-        // @ts-ignore
-        data.delay = parseFloat(e.target.innerText);
-      }}>{data.delay}</span
-    >
-  </div>
-
-  <div class="input-container">
-    <div class="label">Cancel key:</div>
-    <span
-      class="nodrag"
-      class:optional-placeholder={data.cancelKey === ""}
-      contenteditable="true"
-      role="textbox"
-      bind:textContent={data.cancelKey}
-    ></span>
-  </div></BaseNode
->
+</BaseNode>
 
 <style>
-  .input-container span[tabindex="0"] {
-    max-width: 140px;
-  }
-
-  .optional-placeholder::before {
-    content: "Optional";
-    color: rgb(160, 154, 154);
+  span {
+    max-width: 130px;
   }
 </style>

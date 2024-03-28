@@ -13,9 +13,9 @@
     type NodeTypes,
   } from "@xyflow/svelte";
 
-  import TypeNode from "./TypeNode/TypeNode.svelte";
+  import TypeNode from "./TypeNode.svelte";
   import BaseNode from "./BaseNode/BaseNode.svelte";
-  import KeyBindNode from "./KeyBindNode/KeyBindNode.svelte";
+  import KeyBindNode from "./KeyBindNode.svelte";
   import Edge from "./BaseNode/Edge.svelte";
   import { initialNodes, initialEdges } from "./nodes-and-edges";
 
