@@ -70,7 +70,7 @@
   {positionAbsoluteY}
 >
   <div class="input-container">
-    <div class="label">Key Bind:</div>
+    Key Bind:
     <span class="nodrag" contenteditable="true" bind:innerText={data.keyBind}
     ></span>
   </div>

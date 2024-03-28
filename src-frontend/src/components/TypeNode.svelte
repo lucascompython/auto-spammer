@@ -72,13 +72,13 @@
   {positionAbsoluteY}
 >
   <div class="input-container">
-    <div class="label">Text:</div>
+    Text:
     <span class="nodrag" contenteditable="true" bind:innerText={data.text}
     ></span>
   </div>
 
   <div class="input-container">
-    <div class="label">Delay(s):</div>
+    Delay(s):
     <span
       class="nodrag"
       contenteditable="true"
@@ -107,7 +107,7 @@
   </div>
 
   <div class="input-container">
-    <div class="label">Cancel key:</div>
+    Cancel key:
     <span
       class="nodrag"
       class:optional-placeholder={data.cancelKey === ""}
