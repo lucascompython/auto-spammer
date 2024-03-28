@@ -20,13 +20,6 @@
 
   export let data: BaseNodeProps["data"];
 
-  if (data.enableTarget === undefined) {
-    data.enableTarget = true;
-  }
-  if (data.enableSource === undefined) {
-    data.enableSource = true;
-  }
-
   export let id: BaseNodeProps["id"];
 
   // #region Unused props that are here just for not having the "unknown prop" warning
@@ -63,11 +56,16 @@
   let isConnecting = false;
   let isTarget = false;
 
-  $: isConnecting = !!$connection.startHandle?.nodeId;
-  $: isTarget =
-    !!$connection.startHandle &&
-    $connection.startHandle?.nodeId !== id &&
-    $connection.startHandle?.type === "source";
+  $: {
+    data.enableTarget = data.enableTarget ?? true;
+    data.enableSource = data.enableSource ?? true;
+
+    isConnecting = !!$connection.startHandle?.nodeId;
+    isTarget =
+      !!$connection.startHandle &&
+      $connection.startHandle?.nodeId !== id &&
+      $connection.startHandle?.type === "source";
+  }
 </script>
 
 <div class="wrapper gradient">
@@ -104,8 +102,13 @@
   {/if}
   {#if data.enableSource}
     <Handle
-      style="border-color: {isConnecting && !isTarget ? '#2a8af6' : ''}"
+      style="border-color: {isConnecting &&
+      !isTarget &&
+      id !== $connection.startHandle?.nodeId
+        ? '#2a8af6'
+        : ''}"
       type="source"
+      class="source-handle"
       position={Position.Right}
     />
   {/if}
