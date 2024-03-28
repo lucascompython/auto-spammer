@@ -108,7 +108,6 @@
         ? '#2a8af6'
         : ''}"
       type="source"
-      class="source-handle"
       position={Position.Right}
     />
   {/if}
